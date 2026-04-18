@@ -20,7 +20,8 @@
         "laravel/wayfinder": "^0.1.14",
         "meilisearch/meilisearch-php": "^1.16",
         "spatie/laravel-medialibrary": "^11.21",
-        "spatie/laravel-permission": "^7.3"
+        "spatie/laravel-permission": "^7.3",
+        "spatie/laravel-sluggable": "^3.8"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
