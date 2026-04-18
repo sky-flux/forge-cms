@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Web;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\PostResource;
+use App\Models\Post;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class PostController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function index(Request $request): Response
+    {
+        $posts = Post::query()
+            ->published()
+            ->with('user:id,name')
+            ->orderBy('published_at', 'desc')
+            ->paginate(12);
+
+        return Inertia::render('Posts/Index', [
+            'posts' => PostResource::collection($posts),
+        ]);
+    }
+
+    public function show(Request $request, Post $post): Response
+    {
+        $this->authorize('view', $post);
+
+        $post->load('user:id,name');
+        $post->increment('view_count');
+
+        return Inertia::render('Posts/Show', [
+            'post' => new PostResource($post),
+        ]);
+    }
+}
