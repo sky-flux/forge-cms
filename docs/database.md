@@ -6,7 +6,7 @@
 
 > 已与 PRD §7 锁定的决策对齐：
 > - 后台 **Filament 5.5.2** + **spatie/laravel-permission**
-> - 编辑器 **TipTap (via Filament RichEditor)**：`body_html` 主存储 + `body_markdown` 兼容字段
+> - 编辑器 **TipTap (via Filament RichEditor)**：`body_html` 单一来源(若未来需要 Markdown 导出，按需用 `league/html-to-markdown` 服务端往返转换)
 > - **多语言 v1.0 包含**：`posts` / `pages` 走独立 translation 表 + `locale` 字段
 > - **评论 v1.0 包含**：`comments` polymorphic 关联，管理员审核流
 
@@ -69,6 +69,8 @@ settings (单表，配置 kv 存储)
 
 **索引**：`email` UNIQUE；`uuid` UNIQUE；`status` BTREE。
 
+**`id` vs `uuid`**:`id` 是**内部 FK** 用(外键引用 / JOIN 性能);`uuid` 是**外部标识**用(URL / 公开 API / 不暴露自增计数)。`User` 模型的 `getRouteKeyName()` 返回 `'uuid'`,路由模型绑定走 uuid。同样的双主键策略适用于所有有"外部可引用"语义的表(posts / pages / media)。
+
 ### 3.2 `roles` + `role_user`
 
 使用 [spatie/laravel-permission](https://spatie.be/docs/laravel-permission/v6/introduction) 的表结构，初始 seed 三个角色：`admin` / `editor` / `author`。
@@ -111,7 +113,6 @@ role_user: role_id, model_type, model_id, (PK: 三者联合)
 | slug | `varchar(255)` | NOT NULL | URL 片段,按语言独立 |
 | excerpt | `varchar(500)` | NULL | |
 | body_html | `text` | NOT NULL | TipTap 产出的 HTML |
-| body_markdown | `text` | NULL | 可选 MD 导出格式 |
 | seo_title | `varchar(255)` | NULL | 覆盖默认 SEO title |
 | seo_description | `varchar(500)` | NULL | |
 | created_at / updated_at | | | |
@@ -147,7 +148,6 @@ Schema::create('post_translations', function (Blueprint $t) {
     $t->string('slug');
     $t->string('excerpt', 500)->nullable();
     $t->text('body_html');
-    $t->text('body_markdown')->nullable();
     $t->string('seo_title')->nullable();
     $t->string('seo_description', 500)->nullable();
     $t->timestampsTz();
@@ -160,9 +160,9 @@ Schema::create('post_translations', function (Blueprint $t) {
 
 与 `posts` 同构(不关联分类/标签),翻译同样独立表:
 
-`pages` 字段:`id`, `uuid`, `status`, `published_at`, `sort_order`, `is_homepage`, `meta`, `deleted_at`, timestamps。
+`pages` 字段:`id`, `uuid`, `status`, `published_at`, `sort_order`, `is_homepage`, `is_comments_enabled`(boolean, default true, 单页级别评论开关,对应 story.md US-074), `meta`, `deleted_at`, timestamps。
 
-`page_translations` 字段:`id`, `page_id`, `locale`, `title`, `slug`, `body_html`, `body_markdown`, `seo_title`, `seo_description`, timestamps。索引同 `post_translations`。
+`page_translations` 字段:`id`, `page_id`, `locale`, `title`, `slug`, `body_html`, `seo_title`, `seo_description`, timestamps。索引同 `post_translations`。
 
 ### 3.5 `categories` + `category_translations`
 
@@ -291,7 +291,7 @@ Polymorphic 关联(同一张表服务 posts 和 pages),支持嵌套回复。
 | user_id | `bigint` | FK → users.id, SET NULL | 注册用户评论时填;游客留 NULL |
 | guest_name | `varchar(100)` | NULL | 游客昵称 |
 | guest_email | `varchar(255)` | NULL | 游客邮箱(不公开) |
-| guest_ip_hash | `varchar(64)` | NULL | IP 的 SHA256(GDPR 考虑,不存明文) |
+| guest_ip_hash | `varchar(64)` | NULL | HMAC-SHA256(IP, env COMMENT_IP_HMAC_SECRET)——配合 .env secret 做不可逆化,轮换 secret 作废历史比对但保留记录 |
 | user_agent | `varchar(500)` | NULL | 反垃圾审计 |
 | body | `text` | NOT NULL | 纯文本评论内容 |
 | body_html | `text` | NOT NULL | 渲染后的 HTML(净化过的) |
@@ -329,7 +329,7 @@ Schema::create('comments', function (Blueprint $t) {
 ```
 
 **设计说明**:
-- **IP 存哈希不存明文**:GDPR 合规,仅用于同 IP 频率限制和屏蔽,不可逆
+- **IP 存 HMAC 而非明文**:GDPR 合规 & 防彩虹表反查。生成方式:`hash_hmac('sha256', $ip, config('forge.comments.ip_hmac_secret'))`,`.env` 里设 `COMMENT_IP_HMAC_SECRET` 为长随机值。仅用于同 IP 频率限制和屏蔽;轮换 secret 会作废历史比对但不丢记录。若严格匿名不需要历史比对,替换为 `/24` (IPv4) / `/64` (IPv6) 截断即可。**单纯 SHA256(IP) 不够**——IPv4 地址空间只有 ~4.3B,彩虹表可秒级反查。
 - **游客 vs 注册用户**:`user_id` NULL 时用 `guest_name`/`guest_email`;两者互斥由应用层保证
 - **评论不软删**:审核中的垃圾评论直接 `status=spam` 或 `status=trash`,真正清理由定时任务做
 - **反垃圾**:v1.0 用 honeypot 字段 + 速率限制;v1.x 可选集成 Akismet
@@ -376,11 +376,11 @@ Schema::create('comments', function (Blueprint $t) {
 
 **高频查询**：
 1. 前台首页："已发布 + 按 published_at 倒序 + 分页" → `(status, published_at)` 复合索引
-2. 文章详情页：按 slug → `slug` UNIQUE 索引
+2. 文章详情页：按 `(locale, slug)` → 索引落在 `post_translations` 表(`(locale, slug) UNIQUE` 见 §3.3.1);`posts` 表本身不持 slug
 3. 分类归档："某分类下所有已发布" → pivot 表 + `status` 索引
 4. 搜索：**不走数据库**，走 Meilisearch，定期 sync
 
-**避免过度索引**：每个索引都有写放大成本。不给 `title` / `body_markdown` 建普通索引 —— 全文检索交给 Meilisearch。
+**避免过度索引**：每个索引都有写放大成本。不给 `title` / `body_html` 建普通索引 —— 全文检索交给 Meilisearch。
 
 ---
 
