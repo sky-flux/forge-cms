@@ -15,3 +15,11 @@ test('renders the filament dashboard for an authenticated user allowed into the 
 
     $this->actingAs($user)->get('/admin')->assertSuccessful();
 });
+
+test('denies panel access to a regular user in production', function (): void {
+    $this->app->detectEnvironment(fn () => 'production');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get('/admin')->assertForbidden();
+});

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -37,7 +39,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array(app()->environment(), ['local', 'testing'], true)
+        return app()->environment('local', 'testing')
             || $this->hasRole('super_admin');
     }
 }
