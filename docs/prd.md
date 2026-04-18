@@ -70,7 +70,7 @@
 |------|--------|--------|
 | **用户与权限** | 登录、密码重置、用户 CRUD；spatie 三角色：Admin/Editor/Author | P0 |
 | **内容类型** | Post（博客）、Page（静态页） | P0 |
-| **编辑器** | Filament 内置 RichEditor（TipTap 底层）+ Markdown 导入导出 | P0 |
+| **编辑器** | Filament RichEditor（TipTap 底层，WYSIWYG，HTML 单源存储） | P0 |
 | **分类体系** | Category（层级）、Tag（扁平）、多对多挂到 Post | P0 |
 | **评论系统** | Post / Page polymorphic 评论、管理员审核、honeypot + 速率限制反垃圾（无 Akismet，v1.x 加） | P0 |
 | **媒体管理** | 图片/文件上传、本地存储默认、S3 可选、自动缩略图 | P0 |
@@ -152,7 +152,7 @@
 | 前台状态 | **Inertia props** | 服务端推数据为主;复杂客户端状态才用 Zustand |
 | API tokens | **laravel/sanctum** | 已装;与 Fortify session auth 并存不冲突 |
 | 实时推送 | **laravel/reverb** | 已装;WebSocket broadcaster，Laravel 官方,兼容 pusher 协议 |
-| 编辑器 | **Filament RichEditor**（TipTap 底层） | 后台统一组件；数据库存 HTML 为主 + Markdown 导出字段 |
+| 编辑器 | **Filament RichEditor**（TipTap 底层） | 后台统一组件；数据库**单源 HTML 存储**(database.md §3.3.1 已去除 body_markdown 字段)。Markdown 导入 / 导出流转需求留到 v1.x,可选接入 `league/html-to-markdown` 服务端渲染。|
 | 多语言 | **v1.x 规划** | v1.0 先单语言（默认 zh_CN，`APP_LOCALE` 可配置），UI 文案仍支持 zh_CN / en 切换（lang 文件夹已就位）。内容翻译表、locale 路由、`hreflang` 都随 v1.x 一并上。Phase 2 评审后从 P0 降级，为核心 CMS 功能让路。|
 | 评论 | **v1.0 包含** | `comments` polymorphic 关联 post/page；前台 React 组件 + `useForm` 提交。反垃圾 v1.0 走 honeypot（spatie/laravel-honeypot 已装）+ Laravel 原生速率限制；Akismet 第三方 API 集成 v1.x 再加。嵌套回复 DB 层 flat + `parent_id`，UI 层最多 3 级缩进展示。 |
 | 默认存储 | **本地磁盘**（`local` disk） | S3/R2 作为 `.env` 切换项；通过 `spatie/laravel-medialibrary` 抽象 |
