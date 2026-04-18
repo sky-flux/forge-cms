@@ -43,6 +43,9 @@ _ide_helper_models.php
 # Vendor-published translation files (regenerate via vendor:publish when needed)
 /lang/vendor
 
+# Git worktrees for parallel-branch work
+/.worktrees
+
 **/caddy
 frankenphp
 frankenphp-worker.php
