@@ -19,7 +19,11 @@ class PageController extends Controller
     {
         $this->authorize('view', $page);
 
-        $page->load('user:id,name');
+        $page->load([
+            'user:id,name',
+            'approvedComments' => fn ($q) => $q->with('user:id,name')->whereNull('parent_id')->orderBy('created_at', 'asc'),
+            'approvedComments.approvedChildren' => fn ($q) => $q->with('user:id,name')->orderBy('created_at', 'asc'),
+        ]);
 
         return Inertia::render('Pages/Show', [
             'page' => new PageResource($page),

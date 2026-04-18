@@ -30,6 +30,7 @@ class PageResource extends JsonResource
             ],
             'seoTitle' => $this->seo_title,
             'seoDescription' => $this->seo_description,
+            'comments' => CommentResource::collection($this->whenLoaded('approvedComments')),
         ];
     }
 }

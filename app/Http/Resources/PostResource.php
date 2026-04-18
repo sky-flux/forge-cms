@@ -26,11 +26,13 @@ class PostResource extends JsonResource
             'status' => $this->status?->value,
             'publishedAt' => $this->published_at?->toIso8601String(),
             'viewCount' => $this->view_count,
+            'isCommentsEnabled' => (bool) $this->is_comments_enabled,
             'author' => [
                 'name' => $this->whenLoaded('user', fn () => $this->user->name),
             ],
             'seoTitle' => $this->seo_title,
             'seoDescription' => $this->seo_description,
+            'comments' => CommentResource::collection($this->whenLoaded('approvedComments')),
         ];
     }
 }

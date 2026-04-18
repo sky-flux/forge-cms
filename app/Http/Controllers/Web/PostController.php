@@ -33,7 +33,11 @@ class PostController extends Controller
     {
         $this->authorize('view', $post);
 
-        $post->load('user:id,name');
+        $post->load([
+            'user:id,name',
+            'approvedComments' => fn ($q) => $q->with('user:id,name')->whereNull('parent_id')->orderBy('created_at', 'asc'),
+            'approvedComments.approvedChildren' => fn ($q) => $q->with('user:id,name')->orderBy('created_at', 'asc'),
+        ]);
         $post->increment('view_count');
 
         return Inertia::render('Posts/Show', [

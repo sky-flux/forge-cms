@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Comment;
 use App\Models\Page;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -50,4 +51,25 @@ test('page route binds by slug not uuid', function (): void {
 
     // URL with slug resolves
     $this->get("/pages/{$page->slug}")->assertSuccessful();
+});
+
+test('show page includes approved comments in props', function (): void {
+    $page = Page::factory()->published()->create();
+    Comment::factory()->for($page, 'commentable')->approved()->count(2)->create();
+    Comment::factory()->for($page, 'commentable')->create(); // pending — should NOT appear
+
+    $this->get("/pages/{$page->slug}")
+        ->assertInertia(fn ($inertia) => $inertia
+            ->has('page.comments', 2)
+        );
+});
+
+test('show page hides comments when is_comments_enabled is false', function (): void {
+    $page = Page::factory()->published()->create(['is_comments_enabled' => false]);
+    Comment::factory()->for($page, 'commentable')->approved()->create();
+
+    $this->get("/pages/{$page->slug}")
+        ->assertInertia(fn ($inertia) => $inertia
+            ->where('page.isCommentsEnabled', false)
+        );
 });

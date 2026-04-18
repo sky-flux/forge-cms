@@ -1,11 +1,20 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import type { Page } from '@/types/page';
+import type { Comment } from '@/types/comment';
+import { store as pageCommentsStore } from '@/routes/pages/comments';
+import { CommentThread } from '@/components/CommentThread';
+import { CommentForm } from '@/components/CommentForm';
 
 interface Props {
-    page: Page;
+    page: Page & {
+        comments: Comment[];
+    };
 }
 
 export default function PagesShow({ page }: Props) {
+    const inertiaPage = usePage<{ auth?: { user: { id: number } | null } }>();
+    const authenticated = !!inertiaPage.props.auth?.user;
+
     return (
         <>
             <Head>
@@ -35,6 +44,26 @@ export default function PagesShow({ page }: Props) {
                         dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
                     />
                 </article>
+
+                <section className="mt-16 border-t pt-12">
+                    <h2 className="mb-6 text-2xl font-bold tracking-tight">Comments</h2>
+
+                    {page.isCommentsEnabled ? (
+                        <>
+                            <CommentThread comments={page.comments} />
+
+                            <div className="mt-12 border-t pt-6">
+                                <h3 className="mb-4 text-lg font-semibold">Leave a comment</h3>
+                                <CommentForm
+                                    action={pageCommentsStore(page.slug).url}
+                                    authenticated={authenticated}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <p className="text-muted-foreground">Comments are disabled on this page.</p>
+                    )}
+                </section>
             </main>
         </>
     );

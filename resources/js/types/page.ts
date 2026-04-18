@@ -1,4 +1,6 @@
 // Matches App\Http\Resources\PageResource output (with JsonResource::withoutWrapping()).
+import type { Comment } from '@/types/comment';
+
 export interface PageAuthor {
     name?: string;
 }
@@ -17,4 +19,5 @@ export interface Page {
     author: PageAuthor;
     seoTitle: string | null;
     seoDescription: string | null;
+    comments?: Comment[];
 }

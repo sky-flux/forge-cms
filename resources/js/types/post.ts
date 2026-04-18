@@ -16,6 +16,7 @@ export interface Post {
     status: 'draft' | 'published' | 'scheduled';
     publishedAt: string | null;
     viewCount: number;
+    isCommentsEnabled: boolean;
     author: PostAuthor;
     seoTitle: string | null;
     seoDescription: string | null;

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -82,5 +83,26 @@ test('index does NOT leak bodyHtml in the list payload', function (): void {
                 ->missing('bodyHtml')
                 ->etc()
             )
+        );
+});
+
+test('show page includes approved comments in props', function (): void {
+    $post = Post::factory()->published()->create();
+    Comment::factory()->for($post, 'commentable')->approved()->count(2)->create();
+    Comment::factory()->for($post, 'commentable')->create(); // pending — should NOT appear
+
+    $this->get("/posts/{$post->uuid}")
+        ->assertInertia(fn ($inertia) => $inertia
+            ->has('post.comments', 2)
+        );
+});
+
+test('show page hides comments when is_comments_enabled is false', function (): void {
+    $post = Post::factory()->published()->create(['is_comments_enabled' => false]);
+    Comment::factory()->for($post, 'commentable')->approved()->create();
+
+    $this->get("/posts/{$post->uuid}")
+        ->assertInertia(fn ($inertia) => $inertia
+            ->where('post.isCommentsEnabled', false)
         );
 });
