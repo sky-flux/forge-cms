@@ -1,0 +1,15 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+    level: 5
+    excludePaths:
+        - app/Filament/Resources/*
+        - app/Providers/Filament/*.php
+    ignoreErrors:
+        -
+            message: '#should return array<int, array<mixed>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string> but returns array<int, Illuminate\\Validation\\Rules\\Password\|string>#'
+            path: app/Concerns/PasswordValidationRules.php
+    treatPhpDocTypesAsCertain: false
