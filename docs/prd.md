@@ -13,7 +13,7 @@
   - 后端：Laravel 13 on FrankenPHP 1.12.2 + PHP 8.5.5 + Octane worker 模式
   - 数据：PostgreSQL 18.3 + Valkey 9.0.3 + Meilisearch 1.13
   - **管理后台**：**Filament 5.5.2**（Livewire 底层，独占 `/admin/*` 路由）
-  - **前台**：**Inertia.js v2 + React 19 + TypeScript + SSR**
+  - **前台**：**Inertia.js v3 + React 19 + TypeScript + SSR**
   - **SSR**：Node 24.14.1 LTS + `@inertiajs/react/server`（独立进程）
   - **UI 库**：shadcn/ui（copy-in 组件）+ Tailwind 4 + Radix primitives + lucide-react
   - **权限**：spatie/laravel-permission + bezhansalleh/filament-shield
@@ -132,7 +132,7 @@
 | Laravel 版本升级打破插件 | 高 | 明确支持 Laravel LTS；提供升级指南 |
 | Filament 5 深度绑定后期难换 | 中 | 后台抽象接口，理论上可替换；文档标注此依赖 |
 | Valkey 生态未来不稳 | 低 | 协议兼容 Redis，最坏切回 Redis |
-| 前端栈选型拉锯（Blade vs Inertia vs Livewire） | 中 | v1.0 先定 Blade，Inertia 作 v1.x 备选 |
+| Inertia/React 包深度绑定后期难迁移 | 低 | Controller 返回 `Inertia::render` 是抽象点;底层前端框架切换(React → Vue)在 Controller 契约上几乎无感。Phase 1 已装完整 Inertia v3 + React 19 + SSR 栈,风险评估从中降至低。 |
 
 ---
 
@@ -143,7 +143,7 @@
 | 管理后台 | **Filament 5.5.2** | Livewire 底层，独占 `/admin/*`；资源 CRUD 自动生成 |
 | 权限系统 | **spatie/laravel-permission** + **bezhansalleh/filament-shield** | 角色 + 权限双体系；Shield 自动把 Filament Resources 转成权限项 |
 | 认证后端 | **laravel/fortify** | 由 `--react` starter 默认装;处理 login / register / 2FA / password-reset / email-verification 的服务端逻辑。Fortify 是**无 UI 纯后端**,前端页面自由实现 |
-| 前台渲染 | **Inertia.js v2 + React 19 + SSR** | Laravel Controller 返回 `Inertia::render`，Node SSR 产出初始 HTML，浏览器 hydrate 后走 SPA |
+| 前台渲染 | **Inertia.js v3 + React 19 + SSR** | Laravel Controller 返回 `Inertia::render`,Node SSR 产出初始 HTML,浏览器 hydrate 后走 SPA。starter kit 默认装,Phase 1 未改动。注意版本是 v3(原文写 v2 是笔误)。 |
 | 前台 UI 组件 | **shadcn/ui** | copy-in 到 `resources/js/components/ui/`，自由修改 |
 | 前台样式 | **Tailwind 4** + Radix primitives | Filament 和前台共用 Tailwind 实例 |
 | 前台图标 | **lucide-react** | shadcn 默认 icon set |
