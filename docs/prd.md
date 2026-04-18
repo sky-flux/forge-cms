@@ -148,7 +148,8 @@
 | 前台表单 | **Inertia `useForm` hook** | 自动绑定 Laravel FormRequest 的 validation errors，无需 react-hook-form |
 | 前台路由导航 | **Inertia `<Link>` + laravel/wayfinder** | Wayfinder 自动把 Laravel 路由生成**类型安全的 TS 函数**:`PostsController.show(id)` 代替字符串 `route('posts.show', {id})`,IDE 补全、类型检查、重命名路由 TS 侧自动报错 |
 | 前台状态 | **Inertia props** | 服务端推数据为主;复杂客户端状态才用 Zustand |
-| API tokens(v1.x) | **laravel/sanctum** | 未来开放 REST API 时启用;与 Fortify session auth 并存不冲突 |
+| API tokens | **laravel/sanctum** | 已装;与 Fortify session auth 并存不冲突 |
+| 实时推送 | **laravel/reverb** | 已装;WebSocket broadcaster，Laravel 官方,兼容 pusher 协议 |
 | 编辑器 | **Filament RichEditor**（TipTap 底层） | 后台统一组件；数据库存 HTML 为主 + Markdown 导出字段 |
 | 多语言 | **v1.0 包含** | 默认 zh_CN + en；`posts` / `pages` 走 translation 子表；前台 Inertia 共享 `locale` prop |
 | 评论 | **v1.0 包含** | `comments` polymorphic 关联 post/page；前台 React 组件 + `useForm` 提交 |
@@ -210,92 +211,144 @@ forge-cms/
 
 ### 9.1 必装(v1.0 MVP 范围)
 
-| 包 | 用途 | 备注 |
-|----|------|------|
-| `inertiajs/inertia-laravel` | Inertia 服务端 adapter | 返回 `Inertia::render` |
-| `laravel/octane` | FrankenPHP worker 模式 | 生产用 |
-| `laravel/sanctum` | API tokens | v1.x API 会用 |
-| `laravel/scout` | 搜索抽象层 | Meilisearch 驱动 |
-| `meilisearch/meilisearch-php` | Scout 的 Meili 驱动实现 | |
-| `laravel/horizon` | Redis 队列 dashboard + 监控 | |
-| `spatie/laravel-permission` | 角色 + 权限 | |
-| `bezhansalleh/filament-shield` | Filament + spatie/permission 自动桥接 | 为每个 Resource 生成权限项 |
-| `filament/filament` | 管理后台核心 | |
-| `spatie/laravel-medialibrary` | 媒体文件上传、转换、集合管理 | 替代手写 `media` 表;提供缩略图生成、storage 切换、模型关联 |
-| `filament/spatie-laravel-media-library-plugin` | Filament 的 media-library 上传组件 | |
-| `spatie/laravel-sluggable` | 自动从 title 生成 slug | |
-| `spatie/laravel-sitemap` | 生成 sitemap.xml | |
-| `spatie/laravel-activitylog` | 审计日志(谁改了什么) | |
-| `spatie/laravel-backup` | 数据库 + storage 定时备份 | |
+状态说明：
+- ✅ starter — Laravel `--react --pest --bun` starter 自带
+- ✅ installed — 通过独立的 `feat(deps)` commit 补装
+
+| 包 | 版本 | 状态 | 用途 |
+|----|------|------|------|
+| `inertiajs/inertia-laravel` | ^3.0 | ✅ starter | Inertia 服务端 adapter |
+| `laravel/framework` | ^13.0 | ✅ starter | 框架本体 |
+| `laravel/fortify` | ^1.34 | ✅ starter | 认证后端（login/register/2FA/password-reset/email-verification） |
+| `laravel/tinker` | ^3.0 | ✅ starter | artisan tinker REPL |
+| `laravel/wayfinder` | ^0.1.14 | ✅ starter | 类型安全的 TS 路由函数 |
+| `laravel/octane` | ^2.17 | ✅ installed | FrankenPHP worker runner |
+| `laravel/horizon` | ^5.45 | ✅ installed | Redis 队列 dashboard + 监控 |
+| `laravel/scout` | ^11.1 | ✅ installed | 搜索抽象层 |
+| `laravel/sanctum` | ^4.0 | ✅ installed | API tokens；与 Fortify session auth 并存不冲突 |
+| `laravel/reverb` | ^1.10 | ✅ installed | WebSocket broadcaster（pusher 协议兼容） |
+| `meilisearch/meilisearch-php` | ^1.16 | ✅ installed | Scout 的 Meili 驱动实现 |
+| `filament/filament` | ^5.5 | ✅ installed | 管理后台核心 |
+| `bezhansalleh/filament-shield` | ^4.2 | ✅ installed | Filament + spatie/permission 自动桥接；为每个 Resource 生成权限项 |
+| `filament/spatie-laravel-media-library-plugin` | ^5.5 | ✅ installed | Filament 的 media-library 上传组件 |
+| `spatie/laravel-permission` | ^7.3 | ✅ installed | 角色 + 权限 |
+| `spatie/laravel-medialibrary` | ^11.21 | ✅ installed | 媒体文件上传、转换、集合管理；替代手写 `media` 表 |
+| `spatie/laravel-sluggable` | ^3.8 | ✅ installed | 自动从 title 生成 slug |
+| `spatie/laravel-sitemap` | ^8.1 | ✅ installed | 生成 sitemap.xml |
+| `spatie/laravel-activitylog` | ^5.0 | ✅ installed | 审计日志（谁改了什么） |
+| `spatie/laravel-backup` | ^10.2 | ✅ installed | 数据库 + storage 定时备份 |
+| `spatie/laravel-honeypot` | ^4.7 | ✅ installed | 评论/表单反垃圾 honeypot 字段 |
+| `spatie/laravel-feed` | ^4.5 | ✅ installed | RSS/Atom feed |
 
 ### 9.2 开发依赖(require-dev)
 
-| 包 | 用途 |
-|----|------|
-| `laravel/pint` | 代码格式化(PSR-12 + Laravel style),官方 |
-| `pestphp/pest` | 测试框架(2026 年社区默认,比 PHPUnit 写起来简洁) |
-| `pestphp/pest-plugin-laravel` | Pest 的 Laravel 扩展 |
-| `larastan/larastan` | PHPStan for Laravel,静态分析 |
-| `rector/rector` + `driftingly/rector-laravel` | 自动重构升级 |
-| `laravel/telescope` | 请求/查询/job 调试面板(仅 local 启用) |
-| `laravel/pail` | 实时 tail 应用日志 |
-| `barryvdh/laravel-ide-helper` | 生成 IDE 类型提示文件 |
-| `spatie/laravel-ray` | 调试输出(可选,需 Ray 桌面 app) |
+| 包 | 版本 | 状态 | 用途 |
+|----|------|------|------|
+| `laravel/pint` | ^1.27 | ✅ starter | 代码格式化（PSR-12 + Laravel style），官方 |
+| `laravel/pail` | ^1.2.5 | ✅ starter | 实时 tail 应用日志 |
+| `laravel/boost` | ^2.4 | ✅ starter | Laravel Boost MCP server |
+| `laravel/mcp` | ^0.6.7 | ✅ starter | MCP 基础 |
+| `pestphp/pest` | ^4.6 | ✅ starter | 测试框架（2026 年社区默认，比 PHPUnit 写起来简洁） |
+| `pestphp/pest-plugin-laravel` | ^4.1 | ✅ starter | Pest 的 Laravel 扩展 |
+| `fakerphp/faker` | ^1.24 | ✅ starter | 测试假数据 |
+| `mockery/mockery` | ^1.6 | ✅ starter | Mock 对象 |
+| `nunomaduro/collision` | ^8.9 | ✅ starter | 异常输出美化 |
+| `barryvdh/laravel-ide-helper` | ^3.7 | ✅ installed | 生成 IDE 类型提示文件 |
+| `laravel/telescope` | ^5.20 | ✅ installed | 请求/查询/job 调试面板（仅 local 启用） |
+| `larastan/larastan` | ^3.9 | ✅ installed | PHPStan for Laravel，静态分析 |
+| `rector/rector` | ^2.4 | ✅ installed | 自动重构 |
+| `driftingly/rector-laravel` | ^2.3 | ✅ installed | Rector 的 Laravel 规则集 |
+
+`laravel/sail` 已从 starter 中移除，见 §9.5。
 
 ### 9.3 前端依赖(package.json)
 
-生产:
+以下为实际安装状态（对 starter 默认 + 后续补装）：
 
 ```json
 {
   "dependencies": {
-    "@inertiajs/react": "^2.0",
-    "react": "^19.0",
-    "react-dom": "^19.0",
-    "lucide-react": "latest",
-    "class-variance-authority": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest",
-    "sonner": "latest",
-    "cmdk": "latest",
-    "date-fns": "latest",
-    "zod": "latest"
+    "@headlessui/react": "^2.2.10",
+    "@inertiajs/react": "^3.0.3",
+    "@inertiajs/vite": "^3.0.3",
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "concurrently": "^9.2.1",
+    "globals": "^17.5.0",
+    "input-otp": "^1.4.2",
+    "laravel-vite-plugin": "^3.0.1",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "latest",
-    "@tailwindcss/vite": "^4.0",
-    "tailwindcss": "^4.0",
-    "laravel-vite-plugin": "latest",
-    "vite": "^8.0",
-    "typescript": "^5.0",
-    "@types/react": "^19.0",
-    "@types/react-dom": "^19.0",
-    "@types/node": "^22.0"
-  },
-  "volta": {
-    "node": "24.14.1"
+    "@eslint/js": "^10.0.1",
+    "@laravel/vite-plugin-wayfinder": "^0.1.7",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/node": "^25.6.0",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "typescript-eslint": "^8.58.2"
   }
 }
 ```
 
+**刻意未装（等具体 feature 需要时再加，避免 bundle 膨胀）**：
+- `cmdk` —— 命令面板；在真正需要全局 ⌘K 搜索 UI 时再加
+- `date-fns` —— 日期工具；目前日期格式化走后端 toLocaleString 够用
+- `zod` —— schema 校验；后端 FormRequest + Inertia errors 已覆盖，前端无独立校验需求前不装
+
 ### 9.4 v1.x 再加的(不急)
 
-| 包 | 场景 |
-|----|------|
-| `spatie/laravel-translatable` | 如果决定把 translations 合进主表 JSON(目前选独立表,用不到) |
-| `laravel/pulse` | 应用性能监控(上线后再开) |
-| `spatie/laravel-feed` | RSS/Atom feed |
-| `spatie/laravel-newsletter` | 邮件订阅 |
-| `spatie/laravel-honeypot` | 反垃圾评论的 honeypot 字段 |
-| `akaunting/laravel-money` | 如果未来有收费功能 |
-| `filament-notifications` | 后台通知中心 |
+以下包 **尚未安装**，等具体 feature 触发时再 `composer require`：
+
+| 包 | 状态 | 场景 |
+|----|------|------|
+| `spatie/laravel-translatable` | ⏳ 未装 | 如果决定把 translations 合进主表 JSON（目前选独立表，用不到） |
+| `laravel/pulse` | ⏳ 未装 | 应用性能监控（上线后再开） |
+| `spatie/laravel-newsletter` | ⏳ 未装 | 邮件订阅 |
+| `spatie/laravel-tags` | ⏳ 未装 | 如果 post tagging 需求超出手写 `tags` 表承受范围 |
+| `akaunting/laravel-money` | ⏳ 未装 | 如果未来有收费功能 |
+| `filament-notifications` | ⏳ 未装 | 后台通知中心 |
 
 ### 9.5 明确**不**用的
 
 - ❌ `laravel-mix` —— Vite 已取代,官方已弃用
 - ❌ `laravel/breeze` with Blade —— 我们用 Inertia+React starter
+- ❌ `laravel/sail` —— Colima + 我们的 `compose.yml` / `compose.override.yml` 已覆盖 Sail 所有场景（mysql / valkey / meilisearch / artisan / queue worker 容器）；已移除（commit 2a88f54）
 - ❌ `beyondcode/laravel-comments` —— 自建 `comments` 表,包依赖不稳定
 - ❌ `spatie/laravel-comments` —— 付费包,MVP 不划算
+- ❌ `spatie/laravel-ray` —— 需付费桌面 app;Telescope + `laravel/pail` 已覆盖日志/查询调试需求
 - ❌ `jenssegers/agent` —— Laravel 11+ 已有原生 UserAgent 支持
 - ❌ `predis/predis` —— 用更快的 phpredis 扩展(Dockerfile 已装)
 - ❌ `barryvdh/laravel-debugbar` —— Telescope 功能覆盖且更现代
