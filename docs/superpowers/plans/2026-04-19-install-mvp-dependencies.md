@@ -12,11 +12,11 @@
 
 ## Pre-flight Checklist (verify before Task 0)
 
-- [ ] Containers up: `docker ps | grep forge-cms` shows app/postgres/valkey/mailpit/meilisearch.
-- [ ] `.env` has `APP_KEY=base64:...` set.
-- [ ] Git branch is `main`, zero commits so far (`git log --oneline` → "does not have any commits yet" is expected).
-- [ ] Herd Lite PHP works: `make a --version` returns "Laravel Framework 13.x".
-- [ ] Host tests work: `make a test --filter=ExampleTest` returns PASS (Laravel starter ships one example).
+- [x] Containers up: `docker ps | grep forge-cms` shows app/postgres/valkey/mailpit/meilisearch.
+- [x] `.env` has `APP_KEY=base64:...` set.
+- [x] Git branch is `main`, zero commits so far (`git log --oneline` → "does not have any commits yet" is expected).
+- [x] Herd Lite PHP works: `make a --version` returns "Laravel Framework 13.x".
+- [x] Host tests work: `make a test --filter=ExampleTest` returns PASS (Laravel starter ships one example).
 
 ---
 
@@ -47,7 +47,7 @@
 
 **Files:** all currently untracked files at repo root.
 
-- [ ] **Step 0.1: Confirm no secrets are staged**
+- [x] **Step 0.1: Confirm no secrets are staged**
 
 Run:
 ```bash
@@ -56,7 +56,7 @@ grep -E "^(APP_KEY|DB_PASSWORD|REDIS_PASSWORD|MEILISEARCH_KEY)=" .env.example
 ```
 Expected: `.env` is in `.gitignore` (not in `git status`); `.env.example` shows only placeholder values, no real secrets.
 
-- [ ] **Step 0.2: Stage baseline**
+- [x] **Step 0.2: Stage baseline**
 
 Run:
 ```bash
@@ -72,7 +72,7 @@ git status --short
 ```
 Expected: every file listed above shows `A` (added), `storage/framework/**/.gitignore` placeholders included, no `??` entries for files we want in the baseline. `.env` must NOT appear.
 
-- [ ] **Step 0.3: Commit baseline**
+- [x] **Step 0.3: Commit baseline**
 
 Run:
 ```bash
@@ -100,7 +100,7 @@ Expected: one commit on main, hash prefix visible.
 - Modify: `app/Models/User.php` — add `HasRoles` trait.
 - Created by publish: `config/permission.php`, `database/migrations/<timestamp>_create_permission_tables.php`.
 
-- [ ] **Step 1.1: Write failing smoke test**
+- [x] **Step 1.1: Write failing smoke test**
 
 Create `tests/Feature/Deps/PermissionTest.php`:
 ```php
@@ -124,7 +124,7 @@ it('can assign a spatie role to a user and query it back', function (): void {
 });
 ```
 
-- [ ] **Step 1.2: Run test, confirm it fails**
+- [x] **Step 1.2: Run test, confirm it fails**
 
 Run:
 ```bash
@@ -132,7 +132,7 @@ make a test --filter=PermissionTest
 ```
 Expected: FAIL with `Class "Spatie\Permission\Models\Role" not found` (or "does not exist").
 
-- [ ] **Step 1.3: Install package**
+- [x] **Step 1.3: Install package**
 
 Run:
 ```bash
@@ -140,7 +140,7 @@ make c require spatie/laravel-permission
 ```
 Expected: composer adds `spatie/laravel-permission` ^6 to composer.json, dump-autoload succeeds.
 
-- [ ] **Step 1.4: Publish config + migration**
+- [x] **Step 1.4: Publish config + migration**
 
 Run:
 ```bash
@@ -149,7 +149,7 @@ ls config/permission.php database/migrations/ | grep -E "permission"
 ```
 Expected: `config/permission.php` exists; a new migration file named `*_create_permission_tables.php` appears in `database/migrations/`.
 
-- [ ] **Step 1.5: Add `HasRoles` trait to User**
+- [x] **Step 1.5: Add `HasRoles` trait to User**
 
 Edit `app/Models/User.php` — add the trait import and use it:
 ```php
@@ -164,7 +164,7 @@ class User extends Authenticatable
 }
 ```
 
-- [ ] **Step 1.6: Run test, confirm it passes**
+- [x] **Step 1.6: Run test, confirm it passes**
 
 Run:
 ```bash
@@ -172,7 +172,7 @@ make a test --filter=PermissionTest
 ```
 Expected: PASS (1 test, ≥ 1 assertion).
 
-- [ ] **Step 1.7: Run full suite + pint**
+- [x] **Step 1.7: Run full suite + pint**
 
 Run:
 ```bash
@@ -181,7 +181,7 @@ make a test
 ```
 Expected: pint reports 0 style issues; full suite green including the starter auth tests that use `User::factory()`.
 
-- [ ] **Step 1.8: Commit**
+- [x] **Step 1.8: Commit**
 
 Run:
 ```bash
@@ -212,7 +212,7 @@ EOF
 - Modify: `bootstrap/providers.php` (append AdminPanelProvider) — installer does this automatically.
 - Modify: `app/Models/User.php` — implement `FilamentUser` contract with `canAccessPanel`.
 
-- [ ] **Step 2.1: Write failing test**
+- [x] **Step 2.1: Write failing test**
 
 Create `tests/Feature/Deps/FilamentPanelTest.php`:
 ```php
@@ -238,7 +238,7 @@ it('renders the filament dashboard for an authenticated user allowed into the pa
 });
 ```
 
-- [ ] **Step 2.2: Run test, confirm failure**
+- [x] **Step 2.2: Run test, confirm failure**
 
 Run:
 ```bash
@@ -246,7 +246,7 @@ make a test --filter=FilamentPanelTest
 ```
 Expected: FAIL — second assertion hits 404 because `/admin` isn't registered yet; first may pass or fail depending on Laravel's default 404→302 behavior. Both tests should not pass simultaneously.
 
-- [ ] **Step 2.3: Install Filament**
+- [x] **Step 2.3: Install Filament**
 
 Run:
 ```bash
@@ -254,7 +254,7 @@ make c require filament/filament:"^5.5"
 ```
 Expected: `filament/filament` ^5.5 added to composer.json alongside its sub-packages (forms, tables, actions, notifications, widgets, support, infolists, upgrade).
 
-- [ ] **Step 2.4: Scaffold the admin panel**
+- [x] **Step 2.4: Scaffold the admin panel**
 
 Run (non-interactive; Filament accepts `--panel=admin` directly):
 ```bash
@@ -262,7 +262,7 @@ make a filament:install --panels --no-interaction
 ```
 Expected: creates `app/Providers/Filament/AdminPanelProvider.php`, `app/Filament/{Resources,Pages,Widgets}/` directories with `.gitkeep`, and registers the provider in `bootstrap/providers.php`.
 
-- [ ] **Step 2.5: Make User implement FilamentUser (allow access in local/testing)**
+- [x] **Step 2.5: Make User implement FilamentUser (allow access in local/testing)**
 
 Edit `app/Models/User.php`:
 ```php
@@ -283,7 +283,7 @@ class User extends Authenticatable implements FilamentUser
 
 > Why this predicate: in local/testing any user reaches the panel so the smoke test passes with a plain factory user; in production only users with the `super_admin` role (created by Task 3 via Shield) can enter.
 
-- [ ] **Step 2.6: Run test, confirm pass**
+- [x] **Step 2.6: Run test, confirm pass**
 
 Run:
 ```bash
@@ -291,7 +291,7 @@ make a test --filter=FilamentPanelTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 2.7: Run full suite + pint**
+- [x] **Step 2.7: Run full suite + pint**
 
 Run:
 ```bash
@@ -300,7 +300,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 2.8: Commit**
+- [x] **Step 2.8: Commit**
 
 Run:
 ```bash
@@ -330,7 +330,7 @@ EOF
 - Created by installer: `config/filament-shield.php`, `app/Filament/Resources/RoleResource.php` (or similar).
 - Modify: `app/Models/User.php` — add `HasPanelShield` trait (optional; we rely on the role check already in canAccessPanel, so skip).
 
-- [ ] **Step 3.1: Write failing test**
+- [x] **Step 3.1: Write failing test**
 
 Create `tests/Feature/Deps/ShieldTest.php`:
 ```php
@@ -360,7 +360,7 @@ it('lets a super_admin user access the admin panel in production', function (): 
 });
 ```
 
-- [ ] **Step 3.2: Run test, confirm fail**
+- [x] **Step 3.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -368,7 +368,7 @@ make a test --filter=ShieldTest
 ```
 Expected: FAIL with `Class "BezhanSalleh\FilamentShield\Support\Utils" not found`.
 
-- [ ] **Step 3.3: Install Shield**
+- [x] **Step 3.3: Install Shield**
 
 Run:
 ```bash
@@ -376,7 +376,7 @@ make c require bezhansalleh/filament-shield
 ```
 Expected: shield added; `spatie/laravel-permission` already present as peer dep.
 
-- [ ] **Step 3.4: Run Shield installer**
+- [x] **Step 3.4: Run Shield installer**
 
 Run:
 ```bash
@@ -384,7 +384,7 @@ make a shield:install admin --no-interaction
 ```
 Expected: publishes `config/filament-shield.php`, registers `FilamentShieldPlugin` on `AdminPanelProvider`, creates `RoleResource` under `app/Filament/Resources/`.
 
-- [ ] **Step 3.5: Run test, confirm pass**
+- [x] **Step 3.5: Run test, confirm pass**
 
 Run:
 ```bash
@@ -392,7 +392,7 @@ make a test --filter=ShieldTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 3.6: Full suite + pint**
+- [x] **Step 3.6: Full suite + pint**
 
 Run:
 ```bash
@@ -401,7 +401,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 3.7: Commit**
+- [x] **Step 3.7: Commit**
 
 Run:
 ```bash
@@ -432,7 +432,7 @@ EOF
 - Modify: `app/Models/User.php` — implement `HasMedia` (keeps the smoke test simple).
 - Created by publish: migration `*_create_media_table.php`, `config/media-library.php`.
 
-- [ ] **Step 4.1: Write failing test**
+- [x] **Step 4.1: Write failing test**
 
 Create `tests/Feature/Deps/MediaLibraryTest.php`:
 ```php
@@ -463,7 +463,7 @@ it('exposes the filament spatie media-library upload component', function (): vo
 });
 ```
 
-- [ ] **Step 4.2: Run test, confirm fail**
+- [x] **Step 4.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -471,7 +471,7 @@ make a test --filter=MediaLibraryTest
 ```
 Expected: FAIL with `Call to undefined method App\Models\User::addMedia()` (or `HasMedia interface not found`).
 
-- [ ] **Step 4.3: Install both packages**
+- [x] **Step 4.3: Install both packages**
 
 Run:
 ```bash
@@ -479,7 +479,7 @@ make c require spatie/laravel-medialibrary filament/spatie-laravel-media-library
 ```
 Expected: both added.
 
-- [ ] **Step 4.4: Publish media migration + config**
+- [x] **Step 4.4: Publish media migration + config**
 
 Run:
 ```bash
@@ -489,7 +489,7 @@ ls config/media-library.php
 ```
 Expected: `config/media-library.php` exists; `database/migrations/*_create_media_table.php` appears.
 
-- [ ] **Step 4.5: Make User implement HasMedia**
+- [x] **Step 4.5: Make User implement HasMedia**
 
 Edit `app/Models/User.php`:
 ```php
@@ -504,7 +504,7 @@ class User extends Authenticatable implements FilamentUser, HasMedia
 }
 ```
 
-- [ ] **Step 4.6: Run test, confirm pass**
+- [x] **Step 4.6: Run test, confirm pass**
 
 Run:
 ```bash
@@ -512,7 +512,7 @@ make a test --filter=MediaLibraryTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 4.7: Full suite + pint**
+- [x] **Step 4.7: Full suite + pint**
 
 Run:
 ```bash
@@ -521,7 +521,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 4.8: Commit**
+- [x] **Step 4.8: Commit**
 
 Run:
 ```bash
@@ -551,7 +551,7 @@ EOF
 - Create: `tests/Feature/Deps/ScoutTest.php`
 - Created by publish: `config/scout.php`.
 
-- [ ] **Step 5.1: Write failing test**
+- [x] **Step 5.1: Write failing test**
 
 Create `tests/Feature/Deps/ScoutTest.php`:
 ```php
@@ -572,7 +572,7 @@ it('defaults the scout driver to meilisearch per config', function (): void {
 });
 ```
 
-- [ ] **Step 5.2: Run test, confirm fail**
+- [x] **Step 5.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -580,7 +580,7 @@ make a test --filter=ScoutTest
 ```
 Expected: FAIL with `Class "Laravel\Scout\EngineManager" not found`.
 
-- [ ] **Step 5.3: Install Scout + driver**
+- [x] **Step 5.3: Install Scout + driver**
 
 Run:
 ```bash
@@ -588,7 +588,7 @@ make c require laravel/scout meilisearch/meilisearch-php
 ```
 Expected: both added.
 
-- [ ] **Step 5.4: Publish Scout config**
+- [x] **Step 5.4: Publish Scout config**
 
 Run:
 ```bash
@@ -597,7 +597,7 @@ ls config/scout.php
 ```
 Expected: `config/scout.php` present.
 
-- [ ] **Step 5.5: Verify .env already set**
+- [x] **Step 5.5: Verify .env already set**
 
 Run:
 ```bash
@@ -606,7 +606,7 @@ grep -E "^MEILISEARCH_HOST=" .env.example
 ```
 Expected: `.env` already has `SCOUT_DRIVER=meilisearch` (pre-configured per setup.md); `.env.example` has `MEILISEARCH_HOST=http://meilisearch:7700` template.
 
-- [ ] **Step 5.6: Run test, confirm pass**
+- [x] **Step 5.6: Run test, confirm pass**
 
 Run:
 ```bash
@@ -614,7 +614,7 @@ make a test --filter=ScoutTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 5.7: Full suite + pint**
+- [x] **Step 5.7: Full suite + pint**
 
 Run:
 ```bash
@@ -623,7 +623,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 5.8: Commit**
+- [x] **Step 5.8: Commit**
 
 Run:
 ```bash
@@ -652,7 +652,7 @@ EOF
 - Create: `tests/Feature/Deps/OctaneTest.php`
 - Created by installer: `config/octane.php`.
 
-- [ ] **Step 6.1: Write failing test**
+- [x] **Step 6.1: Write failing test**
 
 Create `tests/Feature/Deps/OctaneTest.php`:
 ```php
@@ -671,7 +671,7 @@ it('configures frankenphp as the default octane server', function (): void {
 });
 ```
 
-- [ ] **Step 6.2: Run test, confirm fail**
+- [x] **Step 6.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -679,7 +679,7 @@ make a test --filter=OctaneTest
 ```
 Expected: FAIL — `octane:start` missing from the Artisan registry.
 
-- [ ] **Step 6.3: Install Octane**
+- [x] **Step 6.3: Install Octane**
 
 Run:
 ```bash
@@ -687,7 +687,7 @@ make c require laravel/octane
 ```
 Expected: `laravel/octane` added.
 
-- [ ] **Step 6.4: Run Octane installer with FrankenPHP**
+- [x] **Step 6.4: Run Octane installer with FrankenPHP**
 
 Run:
 ```bash
@@ -695,7 +695,7 @@ make a octane:install --server=frankenphp --no-interaction
 ```
 Expected: installer publishes `config/octane.php`, sets `OCTANE_SERVER=frankenphp` in `.env` if not set, does NOT download the FrankenPHP binary (we use the one inside the container image).
 
-- [ ] **Step 6.5: Run test, confirm pass**
+- [x] **Step 6.5: Run test, confirm pass**
 
 Run:
 ```bash
@@ -703,7 +703,7 @@ make a test --filter=OctaneTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 6.6: Full suite + pint**
+- [x] **Step 6.6: Full suite + pint**
 
 Run:
 ```bash
@@ -712,7 +712,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 6.7: Commit**
+- [x] **Step 6.7: Commit**
 
 Run:
 ```bash
@@ -741,7 +741,7 @@ EOF
 - Create: `tests/Feature/Deps/HorizonTest.php`
 - Created by installer: `config/horizon.php`, `app/Providers/HorizonServiceProvider.php`, public assets under `public/vendor/horizon/`.
 
-- [ ] **Step 7.1: Write failing test**
+- [x] **Step 7.1: Write failing test**
 
 Create `tests/Feature/Deps/HorizonTest.php`:
 ```php
@@ -763,7 +763,7 @@ it('registers the horizon dashboard route at /horizon', function (): void {
 });
 ```
 
-- [ ] **Step 7.2: Run test, confirm fail**
+- [x] **Step 7.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -771,14 +771,14 @@ make a test --filter=HorizonTest
 ```
 Expected: FAIL — no `horizon` artisan command.
 
-- [ ] **Step 7.3: Install Horizon**
+- [x] **Step 7.3: Install Horizon**
 
 Run:
 ```bash
 make c require laravel/horizon
 ```
 
-- [ ] **Step 7.4: Publish + register service provider**
+- [x] **Step 7.4: Publish + register service provider**
 
 Run:
 ```bash
@@ -786,7 +786,7 @@ make a horizon:install
 ```
 Expected: publishes `config/horizon.php`, creates `app/Providers/HorizonServiceProvider.php`, appends it to `bootstrap/providers.php`, copies frontend assets to `public/vendor/horizon/`.
 
-- [ ] **Step 7.5: Run test, confirm pass**
+- [x] **Step 7.5: Run test, confirm pass**
 
 Run:
 ```bash
@@ -794,7 +794,7 @@ make a test --filter=HorizonTest
 ```
 Expected: 2 tests pass.
 
-- [ ] **Step 7.6: Full suite + pint**
+- [x] **Step 7.6: Full suite + pint**
 
 Run:
 ```bash
@@ -803,7 +803,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 7.7: Commit**
+- [x] **Step 7.7: Commit**
 
 Run:
 ```bash
@@ -832,7 +832,7 @@ EOF
 - Create: `tests/Feature/Deps/IdeHelperTest.php`
 - Modify: `.gitignore` — ignore generated helper files.
 
-- [ ] **Step 8.1: Write failing test**
+- [x] **Step 8.1: Write failing test**
 
 Create `tests/Feature/Deps/IdeHelperTest.php`:
 ```php
@@ -849,7 +849,7 @@ it('registers ide-helper artisan commands', function (): void {
 });
 ```
 
-- [ ] **Step 8.2: Run test, confirm fail**
+- [x] **Step 8.2: Run test, confirm fail**
 
 Run:
 ```bash
@@ -857,14 +857,14 @@ make a test --filter=IdeHelperTest
 ```
 Expected: FAIL — command missing.
 
-- [ ] **Step 8.3: Install as dev dep**
+- [x] **Step 8.3: Install as dev dep**
 
 Run:
 ```bash
 make c require --dev barryvdh/laravel-ide-helper
 ```
 
-- [ ] **Step 8.4: Add generated files to .gitignore**
+- [x] **Step 8.4: Add generated files to .gitignore**
 
 Edit `.gitignore` — append:
 ```
@@ -874,7 +874,7 @@ _ide_helper_models.php
 .phpstorm.meta.php
 ```
 
-- [ ] **Step 8.5: Run test, confirm pass**
+- [x] **Step 8.5: Run test, confirm pass**
 
 Run:
 ```bash
@@ -882,7 +882,7 @@ make a test --filter=IdeHelperTest
 ```
 Expected: PASS.
 
-- [ ] **Step 8.6: Full suite + pint**
+- [x] **Step 8.6: Full suite + pint**
 
 Run:
 ```bash
@@ -891,7 +891,7 @@ make a test
 ```
 Expected: green.
 
-- [ ] **Step 8.7: Commit**
+- [x] **Step 8.7: Commit**
 
 Run:
 ```bash
