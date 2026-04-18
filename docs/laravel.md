@@ -779,105 +779,115 @@ Rector 规则集:`rector-laravel` + `rector/rector`(PHP 语言级)。每次 Lara
 
 ### 13.1 生产依赖(`require`)
 
-**标 ✓ 的是 `laravel new --react` 骨架默认装好的,不用再 require。**
+**状态列说明**:`✅ starter` = `laravel new --react` 骨架默认装好的;`✅ installed` = bootstrap 后通过 `composer require` 补装。版本号从 `composer.lock` 取实测值。
 
-| 包 | 当前稳定版 | PHP 约束 | 默认装? | 用途 |
-|----|-----------|----------|---------|------|
-| `laravel/framework` | v13.5.0 | `^8.3` | ✓ | 框架本体 |
-| `laravel/tinker` | v3.0 | `^8.2` | ✓ | artisan tinker REPL |
-| `inertiajs/inertia-laravel` | v3.0.6 | `^8.2.0` | ✓ | Inertia 服务端 adapter |
-| `laravel/fortify` | v1.34 | `^8.2` | ✓ | 认证后端(login/register/2FA/密码重置),纯后端无 UI |
-| `laravel/wayfinder` | v0.1.14 | `^8.2` | ✓ | **取代 Ziggy**:Laravel 路由自动生成类型安全的 TS 函数 |
-| `laravel/octane` | v2.17.1 | `^8.1.0` | — | FrankenPHP worker runner |
-| `laravel/horizon` | v5.45.6 | `^8.0` | — | Redis 队列 dashboard |
-| `laravel/sanctum` | v4.3.1 | `^8.2` | — | API tokens(v1.x 开放 REST API 时用) |
-| `laravel/scout` | v11.1.0 | `^8.0` | — | 搜索抽象层 |
-| `laravel/reverb` | v1.10.0 | `^8.2` | — | 官方 WebSocket broadcaster |
-| `meilisearch/meilisearch-php` | v1.16.1 | `^7.4 \|\| ^8.0` | — | Scout 的 Meili 驱动 |
-| `filament/filament` | v5.5.2 | `^8.2` | — | 管理后台核心 |
-| `bezhansalleh/filament-shield` | 4.2.0 | `^8.2\|^8.3` | — | Filament + spatie/permission 桥接 |
-| `spatie/laravel-permission` | 7.3.0 | `^8.3` | — | 角色与权限 |
-| `spatie/laravel-medialibrary` | 11.21.0 | `^8.2` | — | 媒体文件管理 |
-| `spatie/laravel-sluggable` | 3.8.1 | `^8.2` | — | 自动 slug 生成 |
-| `spatie/laravel-sitemap` | 8.1.0 | `^8.4` | — | `sitemap.xml` 生成 |
-| `spatie/laravel-activitylog` | 5.0.0 | `^8.4` | — | 审计日志 |
-| `spatie/laravel-backup` | 10.2.1 | `^8.3` | — | 定时备份 |
-| `spatie/laravel-honeypot` | 4.7.1 | `^8.2` | — | 评论/表单反垃圾 |
-| `spatie/laravel-feed` | 4.5.0 | `^8.2` | — | RSS/Atom feed(v1.x 用) |
+| 包 | 当前稳定版 | 状态 | PHP 约束 | 用途 |
+|----|-----------|------|----------|------|
+| `laravel/framework` | v13.5.0 | ✅ starter | `^8.3` | 框架本体 |
+| `laravel/tinker` | v3.0 | ✅ starter | `^8.2` | artisan tinker REPL |
+| `inertiajs/inertia-laravel` | v3.0.6 | ✅ starter | `^8.2.0` | Inertia 服务端 adapter |
+| `laravel/fortify` | v1.34 | ✅ starter | `^8.2` | 认证后端(login/register/2FA/密码重置),纯后端无 UI |
+| `laravel/wayfinder` | v0.1.14 | ✅ starter | `^8.2` | **取代 Ziggy**:Laravel 路由自动生成类型安全的 TS 函数 |
+| `laravel/octane` | v2.17.1 | ✅ installed | `^8.1.0` | FrankenPHP worker runner |
+| `laravel/horizon` | v5.45.6 | ✅ installed | `^8.0` | Redis 队列 dashboard |
+| `laravel/sanctum` | v4.3.1 | ✅ installed | `^8.2` | API tokens(v1.x 开放 REST API 时用) |
+| `laravel/scout` | v11.1.0 | ✅ installed | `^8.0` | 搜索抽象层 |
+| `laravel/reverb` | v1.10.0 | ✅ installed | `^8.2` | 官方 WebSocket broadcaster |
+| `meilisearch/meilisearch-php` | v1.16.1 | ✅ installed | `^7.4 \|\| ^8.0` | Scout 的 Meili 驱动 |
+| `filament/filament` | v5.5.2 | ✅ installed | `^8.2` | 管理后台核心 |
+| `bezhansalleh/filament-shield` | 4.2.0 | ✅ installed | `^8.2` | Filament + spatie/permission 桥接 |
+| `filament/spatie-laravel-media-library-plugin` | v5.5.2 | ✅ installed | `^8.2` | Filament media 上传组件 |
+| `spatie/laravel-permission` | 7.3.0 | ✅ installed | `^8.3` | 角色与权限 |
+| `spatie/laravel-medialibrary` | 11.21.0 | ✅ installed | `^8.2` | 媒体文件管理 |
+| `spatie/laravel-sluggable` | 3.8.1 | ✅ installed | `^8.2` | 自动 slug 生成 |
+| `spatie/laravel-sitemap` | 8.1.0 | ✅ installed | `^8.4` | `sitemap.xml` 生成 |
+| `spatie/laravel-activitylog` | 5.0.0 | ✅ installed | `^8.4` | 审计日志 |
+| `spatie/laravel-backup` | 10.2.1 | ✅ installed | `^8.3` | 定时备份 |
+| `spatie/laravel-honeypot` | 4.7.1 | ✅ installed | `^8.2` | 评论/表单反垃圾 |
+| `spatie/laravel-feed` | 4.5.0 | ✅ installed | `^8.2` | RSS/Atom feed(v1.x 用) |
 
 > **关键变更**:`tightenco/ziggy` **不再推荐** —— Laravel 2026 推出的官方 `laravel/wayfinder` 取代了它,`--react` starter 默认装。Wayfinder 生成类型安全 TS 函数,比 Ziggy 的字符串 `route()` 调用更能防错。
 
 ### 13.2 开发依赖(`require-dev`)
 
-**标 ✓ 的是 `laravel new --react --pest` 骨架默认装好的。**
+**状态列说明**:`✅ starter` = `laravel new --react --pest` 骨架默认装好的;`✅ installed` = bootstrap 后通过 `composer require --dev` 补装。
 
-| 包 | 当前稳定版 | PHP 约束 | 默认装? | 用途 |
-|----|-----------|----------|---------|------|
-| `laravel/pint` | v1.29.0 | `^8.2.0` | ✓ | 代码格式化(官方) |
-| `laravel/pail` | v1.2.6 | `^8.2` | ✓ | 实时日志 tail |
-| `pestphp/pest` | v4.6.3 | `^8.3.0` | ✓ | 测试框架 |
-| `pestphp/pest-plugin-laravel` | v4.1 | `^8.2` | ✓ | Pest 的 Laravel 扩展 |
-| `fakerphp/faker` | — | `^8.2` | ✓ | 测试假数据 |
-| `mockery/mockery` | — | `^8.2` | ✓ | Mock 对象 |
-| `nunomaduro/collision` | — | `^8.2` | ✓ | 漂亮的异常输出 |
-| `laravel/sail` | — | `^8.2` | ✓ ⚠️ | **可移除** —— 我们用 Colima,Sail 冗余 |
-| `laravel/telescope` | v5.20.0 | `^8.0` | — | 请求/查询调试面板 |
-| `larastan/larastan` | v3.9.6 | `^8.2` | — | PHPStan for Laravel |
-| `rector/rector` | 2.4.2 | `^7.4\|^8.0` | — | 自动重构 |
-| `driftingly/rector-laravel` | 2.3.0 | `^7.4 \|\| ^8.0` | — | Rector 的 Laravel 规则集 |
-| `barryvdh/laravel-ide-helper` | v3.7.0 | `^8.2` | — | IDE 提示文件生成 |
+| 包 | 当前稳定版 | 状态 | PHP 约束 | 用途 |
+|----|-----------|------|----------|------|
+| `laravel/pint` | v1.29.0 | ✅ starter | `^8.2.0` | 代码格式化(官方) |
+| `laravel/pail` | v1.2.6 | ✅ starter | `^8.2` | 实时日志 tail |
+| `laravel/boost` | v2.4 | ✅ starter | `^8.2` | Laravel Boost MCP 服务端 |
+| `laravel/mcp` | v0.6.7 | ✅ starter | `^8.2` | MCP 基础 |
+| `pestphp/pest` | v4.6.3 | ✅ starter | `^8.3.0` | 测试框架 |
+| `pestphp/pest-plugin-laravel` | v4.1 | ✅ starter | `^8.2` | Pest 的 Laravel 扩展 |
+| `fakerphp/faker` | v1.24 | ✅ starter | `^8.2` | 测试假数据 |
+| `mockery/mockery` | v1.6 | ✅ starter | `^8.2` | Mock 对象 |
+| `nunomaduro/collision` | v8.9 | ✅ starter | `^8.2` | 漂亮的异常输出 |
+| `barryvdh/laravel-ide-helper` | v3.7.0 | ✅ installed | `^8.2` | IDE 提示文件生成 |
+| `laravel/telescope` | v5.20.0 | ✅ installed | `^8.0` | 请求/查询调试面板 |
+| `larastan/larastan` | v3.9.6 | ✅ installed | `^8.2` | PHPStan for Laravel |
+| `rector/rector` | 2.4.2 | ✅ installed | `^7.4 \|\| ^8.0` | 自动重构 |
+| `driftingly/rector-laravel` | 2.3.0 | ✅ installed | `^7.4 \|\| ^8.0` | Rector 的 Laravel 规则集 |
 
-> **清理建议**:bootstrap 完成后执行 `composer remove laravel/sail`,因为 Colima + 我们的 compose 文件已覆盖 Sail 的所有功能。
+> **laravel/sail 清理状态**:已于 commit `2a88f54` 移除 —— Colima + 我们的 compose 文件已覆盖 Sail 的所有功能。详见 §13.5 / PRD §9.5。
 
 ### 13.3 可直接粘贴的 `composer.json` require 块
+
+> 这是本项目 `composer.json` 的**实际状态**(截至最后一次 `feat(deps)` / `chore(deps)` commit)。任何未来想基于同款技术栈起新项目的人,复制这两块 `require` / `require-dev` 即可复刻 forge-cms 的后端依赖矩阵。
 
 ```json
 {
     "require": {
-        "php": "^8.5",
-        "ext-pdo": "*",
-        "ext-redis": "*",
-
-        "laravel/framework": "^13.5",
-        "laravel/octane": "^2.17",
-        "laravel/horizon": "^5.45",
-        "laravel/sanctum": "^4.3",
-        "laravel/scout": "^11.1",
-        "laravel/reverb": "^1.10",
-
-        "meilisearch/meilisearch-php": "^1.16",
-
+        "php": "^8.3",
+        "bezhansalleh/filament-shield": "^4.2",
+        "filament/filament": "^5.5",
+        "filament/spatie-laravel-media-library-plugin": "^5.5",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/fortify": "^1.34",
-        "laravel/wayfinder": "^0.1",
-
-        "filament/filament": "^5.5",
-        "bezhansalleh/filament-shield": "^4.2",
-
-        "spatie/laravel-permission": "^7.3",
-        "spatie/laravel-medialibrary": "^11.21",
-        "spatie/laravel-sluggable": "^3.8",
-        "spatie/laravel-sitemap": "^8.1",
+        "laravel/framework": "^13.0",
+        "laravel/horizon": "^5.45",
+        "laravel/octane": "^2.17",
+        "laravel/reverb": "^1.10",
+        "laravel/sanctum": "^4.0",
+        "laravel/scout": "^11.1",
+        "laravel/tinker": "^3.0",
+        "laravel/wayfinder": "^0.1.14",
+        "meilisearch/meilisearch-php": "^1.16",
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-backup": "^10.2",
+        "spatie/laravel-feed": "^4.5",
         "spatie/laravel-honeypot": "^4.7",
-        "spatie/laravel-feed": "^4.5"
+        "spatie/laravel-medialibrary": "^11.21",
+        "spatie/laravel-permission": "^7.3",
+        "spatie/laravel-sitemap": "^8.1",
+        "spatie/laravel-sluggable": "^3.8"
     },
     "require-dev": {
-        "laravel/pint": "^1.29",
-        "laravel/telescope": "^5.20",
-        "laravel/pail": "^1.2",
-        "pestphp/pest": "^4.6",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "larastan/larastan": "^3.9",
-        "rector/rector": "^2.4",
+        "barryvdh/laravel-ide-helper": "^3.7",
         "driftingly/rector-laravel": "^2.3",
-        "barryvdh/laravel-ide-helper": "^3.7"
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.9",
+        "laravel/boost": "^2.4",
+        "laravel/mcp": "^0.6.7",
+        "laravel/pail": "^1.2.5",
+        "laravel/pint": "^1.27",
+        "laravel/telescope": "^5.20",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.9",
+        "pestphp/pest": "^4.6",
+        "pestphp/pest-plugin-laravel": "^4.1",
+        "rector/rector": "^2.4"
     }
 }
 ```
 
-**安装顺序建议**(宿主机 composer + 容器服务分工):
+**安装顺序**:真实的 package 落地顺序记录在 git 历史里 —— 每个 package 都对应一个独立 `feat(deps)` commit(附带冒烟测试)。查询方法:
+
+```bash
+git log --grep='^feat(deps)' --reverse --oneline
+```
+
+这比本文档维护一份会漂移的清单更可靠。下面的 bootstrap 骨架命令对**新 clone** 仍然正确:
 
 ```bash
 # ========== 宿主机(Herd Lite)==========
@@ -887,34 +897,11 @@ cd ~/workspace/forge-cms
 laravel new tmp --react --pest --bun --database=pgsql --no-interaction
 # --react 把 Inertia + React + shadcn/ui + Vite + Tailwind + 身份验证 UI 一并装好
 # --pest 用 Pest 替代 PHPUnit;--bun 用 Bun 做包管理;--database 预填 .env
-# (--git 是布尔 flag,不接受 =false,默认不启用所以不写;rm 防御嵌套 .git)
 rm -rf tmp/.git 2>/dev/null
 rsync -a --ignore-existing tmp/ . && rm -rf tmp
-# rsync -a 含隐藏文件;--ignore-existing 不覆盖我们已有的 .env.example / README.md
-# (不用 shopt + cp:shopt 是 bash-only,zsh 会报 command not found)
 
-# 2. 清理 Sail(我们不用)
-composer remove laravel/sail
-
-# 3. 装补充的生产依赖(跳过 --react 已装的 inertia / fortify / wayfinder / tinker)
-composer require \
-  laravel/octane laravel/horizon laravel/sanctum laravel/scout laravel/reverb \
-  meilisearch/meilisearch-php \
-  filament/filament bezhansalleh/filament-shield \
-  spatie/laravel-permission spatie/laravel-medialibrary spatie/laravel-sluggable \
-  spatie/laravel-sitemap spatie/laravel-activitylog spatie/laravel-backup \
-  spatie/laravel-honeypot spatie/laravel-feed
-
-# 4. 装补充的开发依赖(跳过已装的 pint / pail / pest / faker / mockery / collision)
-composer require --dev \
-  laravel/telescope \
-  larastan/larastan \
-  rector/rector driftingly/rector-laravel \
-  barryvdh/laravel-ide-helper
-
-# 4. 宿主机跑的 artisan(不连服务)
+# 2. 宿主机跑的 artisan(不连服务)
 php artisan key:generate               # 写 APP_KEY 到 .env
-php artisan pest:install               # Pest 替换 PHPUnit 骨架
 
 # ========== 启动容器服务 ==========
 
@@ -922,34 +909,18 @@ make dev                               # 启动 postgres / valkey / meilisearch 
 
 # ========== 容器内 artisan(需要服务)==========
 
-# 5. vendor publish 产生迁移文件(可 host 跑,放一起更清晰)
-php artisan vendor:publish --tag=permission-migrations
-php artisan vendor:publish --tag=medialibrary-migrations
-php artisan vendor:publish --tag=activitylog-migrations
-
-# 6. 容器内迁移(连 postgres)
+# 3. 各大包的迁移 + 初始化 —— 具体每个包做了什么,看对应的 feat(deps) commit
 make migrate
-
-# 7. 各大包初始化(涉及 Redis/配置)
 make ca octane:install --server=frankenphp
 make ca horizon:install
-make ca scout:install
-make ca reverb:install
 make ca telescope:install
-
-# 8. Filament 后台
 make ca filament:install --panels
-make ca make:filament-user             # 创建首个管理员
-
-# 9. Shield(Filament + spatie/permission 桥接)
-make ca shield:install
-make ca shield:generate                # 扫描 Filament Resources 生成权限项
+make ca shield:install && make ca shield:generate
 
 # ========== 前端 ==========
 
-# 10. 宿主机 bun 装前端依赖 + 首次构建
-bun install                            # 产生 bun.lockb
-bun run build                          # 产生 public/build/
+bun install
+bun run build
 ```
 
 **流程核心**:
@@ -967,7 +938,7 @@ Packagist "popular" 页面前 30 全是**传递依赖**:`symfony/polyfill-*`、`
 
 | ❌ 包 | 原因 | 替代 |
 |------|------|------|
-| `laravel/sail` | Colima + 我们的 compose 已覆盖,重复 | 移除:`composer remove laravel/sail` |
+| `laravel/sail` | Colima + 我们的 compose 已覆盖,重复 —— 已于 commit `2a88f54` 移除 | Colima + `compose.yml` / `compose.override.yml` |
 | `tightenco/ziggy` | 被 `laravel/wayfinder` 取代(类型安全更强) | `laravel/wayfinder`(`--react` 默认装) |
 | `barryvdh/laravel-debugbar` | Telescope 更现代、功能覆盖、和 Octane 兼容 | `laravel/telescope` |
 | `predis/predis` | 比 phpredis 扩展慢 10x+ | Dockerfile 已装 `ext-redis` |
