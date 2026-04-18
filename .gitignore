@@ -40,6 +40,9 @@ _ide_helper_models.php
 /.codex
 /.gemini
 
+# Vendor-published translation files (regenerate via vendor:publish when needed)
+/lang/vendor
+
 **/caddy
 frankenphp
 frankenphp-worker.php
