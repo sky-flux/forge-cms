@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\PostController;
+use App\Http\Controllers\Web\TagController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -17,5 +19,8 @@ Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 Route::get('/pages/{page:slug}', [PageController::class, 'show'])->name('pages.show');
+
+Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 
 require __DIR__.'/settings.php';
