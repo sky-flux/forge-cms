@@ -30,6 +30,11 @@ yarn-error.log
 /.vscode
 /.zed
 
+# IDE helper generated files (regenerate with `make a ide-helper:generate`)
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+
 # local tooling caches (never commit)
 /.cache
 /.codex
