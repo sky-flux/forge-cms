@@ -42,9 +42,9 @@ test('guest reads a published post by uuid', function (): void {
         ->assertSuccessful()
         ->assertInertia(fn ($page) => $page
             ->component('Posts/Show', false)
-            ->where('post.data.uuid', $post->uuid)
-            ->where('post.data.title', 'Hello Post')
-            ->has('post.data.bodyHtml')
+            ->where('post.uuid', $post->uuid)
+            ->where('post.title', 'Hello Post')
+            ->has('post.bodyHtml')
         );
 });
 
