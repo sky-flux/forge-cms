@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Enums\PostStatus;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 test('PostStatus enum exposes draft, published, scheduled cases with labels', function (): void {
     expect(PostStatus::Draft->value)->toBe('draft');
@@ -60,4 +62,54 @@ test('post belongs to its author', function (): void {
     $post = Post::factory()->for($author)->create();
 
     expect($post->user->is($author))->toBeTrue();
+});
+
+test('slug is auto-generated from title on save', function (): void {
+    $post = Post::factory()->create(['title' => 'Hello World Post']);
+
+    expect($post->slug)->toBe('hello-world-post');
+});
+
+test('slug is unique — duplicates get a suffix', function (): void {
+    Post::factory()->create(['title' => 'Same Title']);
+    $second = Post::factory()->create(['title' => 'Same Title']);
+
+    expect($second->slug)->not->toBe('same-title');
+    expect($second->slug)->toStartWith('same-title-');
+});
+
+test('published post is searchable and exposes key fields in toSearchableArray', function (): void {
+    $post = Post::factory()->published()->create([
+        'title' => 'Searchable Title',
+        'body_html' => '<p>body text</p>',
+    ]);
+
+    expect($post->shouldBeSearchable())->toBeTrue();
+
+    $array = $post->toSearchableArray();
+    expect($array)->toHaveKeys(['id', 'uuid', 'title', 'excerpt', 'body_html', 'status', 'published_at'])
+        ->and($array['title'])->toBe('Searchable Title')
+        ->and($array['body_html'])->toBe('body text'); // strip_tags
+});
+
+test('draft post is not searchable', function (): void {
+    $post = Post::factory()->create(); // draft by default
+
+    expect($post->shouldBeSearchable())->toBeFalse();
+});
+
+test('post accepts media uploads to featured and gallery collections', function (): void {
+    Storage::fake('public');
+
+    $post = Post::factory()->create();
+
+    $post->addMedia(UploadedFile::fake()->image('cover.png'))
+        ->toMediaCollection('featured');
+    $post->addMedia(UploadedFile::fake()->image('shot1.png'))
+        ->toMediaCollection('gallery');
+    $post->addMedia(UploadedFile::fake()->image('shot2.png'))
+        ->toMediaCollection('gallery');
+
+    expect($post->fresh()->getMedia('featured'))->toHaveCount(1);
+    expect($post->fresh()->getMedia('gallery'))->toHaveCount(2);
 });
