@@ -1,0 +1,49 @@
+{
+    frankenphp
+    order php_server before file_server
+    admin off
+
+    # Let's Encrypt 注册邮箱（生产必填，没有 .localhost 时 Caddy 会申请正式证书）
+    email {$CADDY_EMAIL}
+}
+
+{$SERVER_NAME} {
+    root /app/public
+    encode zstd br gzip
+
+    # 敏感文件深度防御（虽然 root 已隔离，防止人为失误把它们挪进 public）
+    @forbidden path /.git/* /.env /.env.* /composer.* /package.* /artisan /storage/logs/* /bootstrap/cache/*
+    respond @forbidden 404
+
+    # 安全响应头
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "interest-cohort=(), geolocation=(), microphone=(), camera=()"
+        -Server
+        -X-Powered-By
+    }
+
+    # Laravel 前端控制器
+    php_server
+
+    log {
+        output stderr
+        format json
+        level INFO
+    }
+
+    # 带哈希的 Vite 构建产物：永久缓存 + immutable
+    @immutable path /build/*
+    header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+    # 其他静态资源：一年缓存（非 immutable，留余地强刷）
+    @static path *.css *.js *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.woff *.woff2 *.ico
+    header @static Cache-Control "public, max-age=31536000"
+
+    # Source map：不缓存（方便紧急排障时替换）
+    @maps path *.map
+    header @maps Cache-Control "no-cache"
+}

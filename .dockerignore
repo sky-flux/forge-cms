@@ -1,0 +1,65 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Dependencies（镜像内会重新 install）
+vendor
+node_modules
+
+# 前端产物（由 frontend-builder stage 生成）
+public/build
+public/hot
+
+# Laravel 运行时
+storage/logs/*
+!storage/logs/.gitignore
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/app/public
+storage/*.key
+bootstrap/cache/*.php
+
+# 测试与代码质量
+tests
+.phpunit.cache
+.phpunit.result.cache
+phpstan.neon
+phpstan.neon.dist
+.php-cs-fixer.cache
+pint.json
+
+# Docker / 编排（不需要进镜像）
+compose*.yml
+compose*.yaml
+compose.override.local.yml
+Dockerfile*
+.dockerignore
+Makefile
+
+# 部署辅助资产
+deploy/.env.production
+deploy/.env.production.example
+
+# IDE
+.idea
+.vscode
+.fleet
+.zed
+.nova
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 文档
+README.md
+CHANGELOG.md
+docs

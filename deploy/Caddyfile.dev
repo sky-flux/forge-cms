@@ -1,0 +1,28 @@
+{
+    frankenphp
+    order php_server before file_server
+    admin off
+    auto_https off
+}
+
+:80 {
+    root /app/public
+    encode zstd br gzip
+
+    # 敏感文件拦截（双保险：root 已指向 public，理论上 /app 根下的文件已不可达）
+    @forbidden path /.git/* /.env /.env.*
+    respond @forbidden 404
+
+    # Laravel 前端控制器：php_server 自动 try_files → index.php
+    php_server
+
+    log {
+        output stderr
+        format console
+        level DEBUG
+    }
+
+    # 开发环境：静态资源不缓存，修改立即反映
+    @static path *.css *.js *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.woff *.woff2 *.ico *.map
+    header @static Cache-Control "no-store, no-cache, must-revalidate"
+}

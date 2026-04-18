@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      target: dev
+    ports:
+      - "${APP_PORT:-8080}:80"
+      # Dev 关闭 HTTPS（Caddyfile.dev 里 auto_https off）,443 不再占用宿主机端口。
+      # 生产环境的 HTTPS 在 compose.prod.yml 里单独配置。
+    volumes:
+      - .:/app:cached
+      - caddy-data:/data
+      - caddy-config:/config
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-forge-cms.localhost}
+      APP_ENV: local
+      APP_DEBUG: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  valkey:
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+    volumes:
+      - mailpit-data:/data
+    networks:
+      - app
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.13
+    restart: unless-stopped
+    ports:
+      - "${MEILISEARCH_PORT:-7700}:7700"
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_KEY:-masterKey}
+      MEILI_ENV: development
+    volumes:
+      - meilisearch-data:/meili_data
+    networks:
+      - app
+
+volumes:
+  caddy-data:
+  caddy-config:
+  mailpit-data:
+  meilisearch-data:

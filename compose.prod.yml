@@ -1,0 +1,144 @@
+name: ${COMPOSE_PROJECT_NAME:-forge-cms}
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: prod
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.5.5}
+        FRANKENPHP_VERSION: ${FRANKENPHP_VERSION:-1.12.2}
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+      - app-storage:/app/storage/app
+    environment:
+      SERVER_NAME: ${APP_DOMAIN}
+      APP_ENV: production
+      APP_DEBUG: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    command:
+      - "php"
+      - "artisan"
+      - "octane:frankenphp"
+      - "--host=0.0.0.0"
+      - "--port=80"
+      - "--workers=auto"
+      - "--max-requests=500"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  postgres:
+    image: postgres:18.3-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  valkey:
+    image: valkey/valkey:9.0.3-alpine3.23
+    restart: always
+    command: >
+      valkey-server
+      --save 60 1
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  queue:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: prod
+    restart: always
+    depends_on:
+      - postgres
+      - valkey
+    environment:
+      APP_ENV: production
+    command: ["php", "artisan", "horizon"]
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: prod
+    restart: always
+    depends_on:
+      - postgres
+      - valkey
+    environment:
+      APP_ENV: production
+    command: ["php", "artisan", "schedule:work"]
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  valkey-data:
+  caddy-data:
+  caddy-config:
+  app-storage:
