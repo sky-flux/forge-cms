@@ -72,17 +72,18 @@
 | **内容类型** | Post（博客）、Page（静态页） | P0 |
 | **编辑器** | Filament 内置 RichEditor（TipTap 底层）+ Markdown 导入导出 | P0 |
 | **分类体系** | Category（层级）、Tag（扁平）、多对多挂到 Post | P0 |
-| **多语言内容** | ⭐ 支持多语言文章/页面；默认中英双语，可扩展 | P0 |
 | **评论系统** | ⭐ Post 下评论、管理员审核、反垃圾（honeypot + Akismet 可选） | P0 |
 | **媒体管理** | 图片/文件上传、本地存储默认、S3 可选、自动缩略图 | P0 |
 | **发布流** | Draft / Published / Scheduled 三态；30 天垃圾箱 | P0 |
 | **前台** | 文章列表页、详情页、分类/标签归档、Meilisearch 搜索 | P0 |
-| **SEO 基础** | meta title/description/OG、sitemap.xml、robots.txt、hreflang（多语言） | P0 |
+| **SEO 基础** | meta title/description/OG、sitemap.xml、robots.txt | P0 |
 | **管理后台** | **Filament 5.5.2**，含 Dashboard / Posts / Pages / Media / Users / Settings | P0 |
 | **开发邮件** | Mailpit 捕获（setup.md 已配） | P1 |
 
 ### 3.2 v1.x（MVP 之后，一年内）
 
+- 多语言内容（独立 `*_translations` 表 + locale 路由 + fallback 策略 + Filament 翻译 Tab）
+- `hreflang` 标签自动生成（随多语言内容一起上）
 - RSS/Atom feed
 - 邮件订阅（与 Newsletter 集成）
 - API 令牌 + 公开 REST API（Sanctum）
@@ -109,7 +110,7 @@
 | **可观测** | 结构化日志（JSON，可接 Loki）；关键路径 metrics（可选接 Prometheus） |
 | **部署** | 单节点 Docker Compose 即可运行；可选 K8s/Ansible（不在 v1 范围） |
 | **浏览器兼容** | 管理后台：最新版 Chrome/Firefox/Safari；前台：IE11 不支持 |
-| **国际化** | UI 语言支持中英双语切换（v1.0），内容多语言（v1.x） |
+| **国际化** | UI 语言 v1.0 支持 zh_CN / en 切换（`lang/` 目录已就位）；**内容多语言 v1.x 实现**（独立翻译表 + locale 路由）|
 
 ---
 
@@ -151,7 +152,7 @@
 | API tokens | **laravel/sanctum** | 已装;与 Fortify session auth 并存不冲突 |
 | 实时推送 | **laravel/reverb** | 已装;WebSocket broadcaster，Laravel 官方,兼容 pusher 协议 |
 | 编辑器 | **Filament RichEditor**（TipTap 底层） | 后台统一组件；数据库存 HTML 为主 + Markdown 导出字段 |
-| 多语言 | **v1.0 包含** | 默认 zh_CN + en；`posts` / `pages` 走 translation 子表；前台 Inertia 共享 `locale` prop |
+| 多语言 | **v1.x 规划** | v1.0 先单语言（默认 zh_CN，`APP_LOCALE` 可配置），UI 文案仍支持 zh_CN / en 切换（lang 文件夹已就位）。内容翻译表、locale 路由、`hreflang` 都随 v1.x 一并上。Phase 2 评审后从 P0 降级，为核心 CMS 功能让路。|
 | 评论 | **v1.0 包含** | `comments` polymorphic 关联 post/page；前台 React 组件 + `useForm` 提交 |
 | 默认存储 | **本地磁盘**（`local` disk） | S3/R2 作为 `.env` 切换项；通过 `spatie/laravel-medialibrary` 抽象 |
 
