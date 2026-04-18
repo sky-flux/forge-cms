@@ -65,6 +65,33 @@ laravel --version
 - 装到 `~/.config/herd-lite/bin`,不污染系统路径
 - 需要**付费版 Herd**(Nginx/DnsMasq/MySQL 集成)再考虑,开发阶段 Lite 足够
 
+#### Linux 等价路径
+
+Mac 用 Herd Lite 是因为 macOS 自带 PHP 版本老;Linux 上有两条路径:
+
+```bash
+# 路径 A:沿用官方一键脚本(Linux 版)
+/bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
+source ~/.bashrc   # 或 ~/.zshrc
+```
+
+```bash
+# 路径 B:系统包管理器 + composer
+# Debian / Ubuntu
+sudo apt install -y php8.5 php8.5-cli php8.5-common php8.5-pgsql php8.5-redis php8.5-intl php8.5-zip php8.5-gd php8.5-bcmath php8.5-mbstring php8.5-xml composer
+composer global require laravel/installer
+
+# Fedora / RHEL
+sudo dnf install -y php php-cli php-pgsql php-redis php-intl php-zip php-gd php-bcmath php-mbstring php-xml composer
+
+# Arch
+sudo pacman -S --needed php php-pgsql php-intl php-gd composer
+```
+
+验证命令(`php --version` / `composer --version` / `laravel --version`)和 Mac 完全一致。
+
+README 声明的 "Linux works too, paths may differ" 兑现路径就是这一段。Colima 在 Linux 可选 —— Linux 用户可以直接用系统 Docker,无需 colima 这一层。
+
 ### 1.1 安装 Colima 和 Docker CLI(服务层)
 
 ```bash

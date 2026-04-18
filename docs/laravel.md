@@ -264,7 +264,7 @@ public function scopePublished(Builder $q): void
 }
 ```
 
-唯一的例外:切换底层 ORM(几乎不可能发生) 或 跨多个数据源。
+**例外场景**(引入 Repository 层是合理的):多租户分数据库路由、事件溯源(event sourcing)、跨多个存储系统的双写(比如 Postgres + Elasticsearch)、或底层 ORM 切换(少见但不是零)。核心原则:**不要反射性地加一层**,但遇到上述场景也不强行"Eloquent only"。判断标准:Eloquent scope / Action 能干净表达吗?能就直接用;不能才考虑 Repository。
 
 ---
 
