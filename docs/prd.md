@@ -128,7 +128,7 @@
 | 风险 | 影响 | 缓解 |
 |------|------|------|
 | Laravel 版本升级打破插件 | 高 | 明确支持 Laravel LTS；提供升级指南 |
-| Filament 3 深度绑定后期难换 | 中 | 后台抽象接口，理论上可替换；文档标注此依赖 |
+| Filament 5 深度绑定后期难换 | 中 | 后台抽象接口，理论上可替换；文档标注此依赖 |
 | Valkey 生态未来不稳 | 低 | 协议兼容 Redis，最坏切回 Redis |
 | 前端栈选型拉锯（Blade vs Inertia vs Livewire） | 中 | v1.0 先定 Blade，Inertia 作 v1.x 备选 |
 

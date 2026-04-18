@@ -12,6 +12,8 @@
 |------|------|------|
 | 运行时 | PHP on FrankenPHP（Caddy + Octane worker 模式） | 8.5.5 / 1.12.2 |
 | 框架 | Laravel | 13.x |
+| 管理后台 | Filament | 5.5.2 |
+| 权限 | spatie/laravel-permission + bezhansalleh/filament-shield | 7.3.0 / 4.2.0 |
 | 数据库 | PostgreSQL | 18.3 |
 | 缓存 / 队列 | Valkey（BSD 许可的 Redis 分叉） | 9.0.3 |
 | 搜索 | Meilisearch | 1.13 |

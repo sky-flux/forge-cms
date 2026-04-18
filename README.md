@@ -12,6 +12,8 @@
 |-------|--------|---------|
 | Runtime | PHP on FrankenPHP (Caddy + Octane worker mode) | 8.5.5 / 1.12.2 |
 | Framework | Laravel | 13.x |
+| Admin Panel | Filament | 5.5.2 |
+| RBAC | spatie/laravel-permission + bezhansalleh/filament-shield | 7.3.0 / 4.2.0 |
 | Database | PostgreSQL | 18.3 |
 | Cache / Queue | Valkey (BSD-licensed Redis fork) | 9.0.3 |
 | Search | Meilisearch | 1.13 |

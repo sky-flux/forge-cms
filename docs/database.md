@@ -78,7 +78,7 @@ roles: id, name, guard_name, created_at, updated_at
 role_user: role_id, model_type, model_id, (PK: 三者联合)
 ```
 
-> **说明**：Filament 3 与 spatie/laravel-permission 集成成熟，直接用包的迁移即可，不自建 schema。
+> **说明**：Filament 5 与 spatie/laravel-permission 集成成熟，直接用包的迁移即可，不自建 schema。
 
 ### 3.3 `posts`（不含翻译字段）
 
