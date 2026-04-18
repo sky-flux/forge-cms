@@ -10,11 +10,16 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
 - php - 8.5
+- filament/filament (FILAMENT) - v5
 - inertiajs/inertia-laravel (INERTIA_LARAVEL) - v3
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v13
+- laravel/horizon (HORIZON) - v5
+- laravel/octane (OCTANE) - v2
 - laravel/prompts (PROMPTS) - v0
+- laravel/scout (SCOUT) - v11
 - laravel/wayfinder (WAYFINDER) - v0
+- livewire/livewire (LIVEWIRE) - v4
 - laravel/boost (BOOST) - v2
 - laravel/mcp (MCP) - v0
 - laravel/pail (PAIL) - v1
@@ -29,6 +34,17 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - eslint (ESLINT) - v
 - prettier (PRETTIER) - v
 
+## Third-Party Ecosystem Packages
+
+Not part of Boost's auto-detection but central to this application:
+
+- spatie/laravel-permission - v7 (roles + permissions; `HasRoles` trait on `User`)
+- bezhansalleh/filament-shield - v4 (Filament/Permission bridge; `super_admin` role bypass + `FilamentShieldPlugin` on admin panel)
+- spatie/laravel-medialibrary - v11 (polymorphic media attach; `HasMedia`/`InteractsWithMedia` on `User`)
+- filament/spatie-laravel-media-library-plugin - v5 (Filament upload form component)
+- meilisearch/meilisearch-php - v1 (Scout's Meilisearch engine)
+- barryvdh/laravel-ide-helper - v3 (dev-only; `ide-helper:generate` / `ide-helper:models`)
+
 ## Skills Activation
 
 This project has domain-specific skills available. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
@@ -38,6 +54,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 - `wayfinder-development` — Use this skill for Laravel Wayfinder which auto-generates typed functions for Laravel controllers and routes. ALWAYS use this skill when frontend code needs to call backend routes or controller actions. Trigger when: connecting any React/Vue/Svelte/Inertia frontend to Laravel controllers, routes, building end-to-end features with both frontend and backend, wiring up forms or links to backend endpoints, fixing route-related TypeScript errors, importing from @/actions or @/routes, or running wayfinder:generate. Use Wayfinder route functions instead of hardcoded URLs. Covers: wayfinder() vite plugin, .url()/.get()/.post()/.form(), query params, route model binding, tree-shaking. Do not use for backend-only task
 - `pest-testing` — Use this skill for Pest PHP testing in Laravel projects only. Trigger whenever any test is being written, edited, fixed, or refactored — including fixing tests that broke after a code change, adding assertions, converting PHPUnit to Pest, adding datasets, and TDD workflows. Always activate when the user asks how to write something in Pest, mentions test files or directories (tests/Feature, tests/Unit, tests/Browser), or needs browser testing, smoke testing multiple pages for JS errors, or architecture tests. Covers: test()/it()/expect() syntax, datasets, mocking, browser testing (visit/click/fill), smoke testing, arch(), Livewire component tests, RefreshDatabase, and all Pest 4 features. Do not use for factories, seeders, migrations, controllers, models, or non-test PHP code.
 - `inertia-react-development` — Develops Inertia.js v3 React client-side applications. Activates when creating React pages, forms, or navigation; using <Link>, <Form>, useForm, useHttp, setLayoutProps, or router; working with deferred props, prefetching, optimistic updates, instant visits, or polling; or when user mentions React with Inertia, React pages, React forms, or React navigation.
+
+> Note: the Skills Activation list above and the Third-Party Ecosystem section are maintained **by hand** — Boost's `boost:install --guidelines` regenerates the auto-detected `Foundational Context` block and overwrites custom content placed inside it. Keep these sections here (outside the block Boost regenerates) and restore them if a future Boost run wipes them.
 
 ## Conventions
 
@@ -109,6 +127,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 # PHP
 
+- Always declare `declare(strict_types=1);` at the top of every `.php` file.
 - Always use curly braces for control structures, even for single-line bodies.
 - Use PHP 8 constructor property promotion: `public function __construct(public GitHub $github) { }`. Do not leave empty zero-parameter `__construct()` methods unless the constructor is private.
 - Use explicit return type declarations and type hints for all method parameters: `function isAccessible(User $user, ?string $path = null): bool`
@@ -181,6 +200,24 @@ This project has domain-specific skills available. You MUST activate the relevan
 ## Vite Error
 
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `bun run build` or ask the user to run `bun run dev` or `composer run dev`.
+
+=== octane/core rules ===
+
+# Octane
+
+- Octane boots the application once and reuses it across requests, so singletons persist between requests.
+- The Laravel container's `scoped` method may be used as a safe alternative to `singleton`.
+- Never inject the container, request, or config repository into a singleton's constructor; use a resolver closure or `bind()` instead:
+
+```php
+// Bad
+$this->app->singleton(Service::class, fn (Application $app) => new Service($app['request']));
+
+// Good
+$this->app->singleton(Service::class, fn () => new Service(fn () => request()));
+```
+
+- Never append to static properties, as they accumulate in memory across requests.
 
 === wayfinder/core rules ===
 
