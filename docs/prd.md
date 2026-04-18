@@ -72,7 +72,7 @@
 | **内容类型** | Post（博客）、Page（静态页） | P0 |
 | **编辑器** | Filament 内置 RichEditor（TipTap 底层）+ Markdown 导入导出 | P0 |
 | **分类体系** | Category（层级）、Tag（扁平）、多对多挂到 Post | P0 |
-| **评论系统** | ⭐ Post 下评论、管理员审核、反垃圾（honeypot + Akismet 可选） | P0 |
+| **评论系统** | Post / Page polymorphic 评论、管理员审核、honeypot + 速率限制反垃圾（无 Akismet，v1.x 加） | P0 |
 | **媒体管理** | 图片/文件上传、本地存储默认、S3 可选、自动缩略图 | P0 |
 | **发布流** | Draft / Published / Scheduled 三态；30 天垃圾箱 | P0 |
 | **前台** | 文章列表页、详情页、分类/标签归档、Meilisearch 搜索 | P0 |
@@ -90,6 +90,7 @@
 - 主题系统（多套 Blade 模板切换）
 - 版本历史（文章 revision）
 - 可配置 webhook / 站点事件推送
+- Akismet 评论反垃圾（v1.0 仅靠 honeypot + 速率限制；Akismet API key 管理、故障降级等都留给 v1.x）
 
 ### 3.3 v2.0+（未来考虑）
 
@@ -153,7 +154,7 @@
 | 实时推送 | **laravel/reverb** | 已装;WebSocket broadcaster，Laravel 官方,兼容 pusher 协议 |
 | 编辑器 | **Filament RichEditor**（TipTap 底层） | 后台统一组件；数据库存 HTML 为主 + Markdown 导出字段 |
 | 多语言 | **v1.x 规划** | v1.0 先单语言（默认 zh_CN，`APP_LOCALE` 可配置），UI 文案仍支持 zh_CN / en 切换（lang 文件夹已就位）。内容翻译表、locale 路由、`hreflang` 都随 v1.x 一并上。Phase 2 评审后从 P0 降级，为核心 CMS 功能让路。|
-| 评论 | **v1.0 包含** | `comments` polymorphic 关联 post/page；前台 React 组件 + `useForm` 提交 |
+| 评论 | **v1.0 包含** | `comments` polymorphic 关联 post/page；前台 React 组件 + `useForm` 提交。反垃圾 v1.0 走 honeypot（spatie/laravel-honeypot 已装）+ Laravel 原生速率限制；Akismet 第三方 API 集成 v1.x 再加。嵌套回复 DB 层 flat + `parent_id`，UI 层最多 3 级缩进展示。 |
 | 默认存储 | **本地磁盘**（`local` disk） | S3/R2 作为 `.env` 切换项；通过 `spatie/laravel-medialibrary` 抽象 |
 
 ## 8. 前台目录结构
