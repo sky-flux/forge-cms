@@ -1,5 +1,4 @@
 import { useForm } from '@inertiajs/react';
-import type { FormEvent } from 'react';
 
 interface Props {
     action: string;
@@ -13,13 +12,13 @@ export function CommentForm({ action, authenticated }: Props) {
         guest_email: '',
     });
 
-    function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         post(action, {
             onSuccess: () => reset(),
             preserveScroll: true,
         });
-    }
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
