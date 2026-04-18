@@ -121,7 +121,10 @@ return [
     ],
 
     'ignore_commands' => [
-        //
+        // Skip the CommandWatcher for `artisan test` runs so Telescope's
+        // post-termination flush doesn't try to insert into the pgsql
+        // connection (which is unreachable from the host process).
+        'test',
     ],
 
     /*
