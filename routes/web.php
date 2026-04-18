@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\PostController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -14,5 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+Route::get('/pages/{page:slug}', [PageController::class, 'show'])->name('pages.show');
 
 require __DIR__.'/settings.php';
