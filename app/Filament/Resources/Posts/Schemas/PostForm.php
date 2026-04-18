@@ -52,6 +52,21 @@ class PostForm
                 SpatieMediaLibraryFileUpload::make('featured')
                     ->collection('featured')
                     ->image(),
+                Select::make('categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
+                Select::make('tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(50),
+                    ]),
             ]);
     }
 }
