@@ -34,3 +34,7 @@ yarn-error.log
 /.cache
 /.codex
 /.gemini
+
+**/caddy
+frankenphp
+frankenphp-worker.php
