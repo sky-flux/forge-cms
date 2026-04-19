@@ -25,7 +25,7 @@ class ActivityLogResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
-    protected static ?string $navigationLabel = '活动日志';
+    protected static ?string $navigationLabel = '活动';
 
     protected static ?string $modelLabel = '活动';
 

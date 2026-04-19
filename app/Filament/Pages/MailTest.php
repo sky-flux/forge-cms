@@ -19,9 +19,9 @@ class MailTest extends Page
 
     protected static ?int $navigationSort = 8;
 
-    protected static ?string $navigationLabel = '邮件测试';
+    protected static ?string $navigationLabel = '邮件';
 
-    protected static ?string $title = '邮件测试';
+    protected static ?string $title = '邮件';
 
     protected static ?string $slug = 'mail-test';
 
