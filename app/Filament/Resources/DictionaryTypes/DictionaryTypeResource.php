@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DictionaryTypes;
 use App\Filament\Resources\DictionaryTypes\Pages\CreateDictionaryType;
 use App\Filament\Resources\DictionaryTypes\Pages\EditDictionaryType;
 use App\Filament\Resources\DictionaryTypes\Pages\ListDictionaryTypes;
+use App\Filament\Resources\DictionaryTypes\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\DictionaryTypes\Schemas\DictionaryTypeForm;
 use App\Filament\Resources\DictionaryTypes\Tables\DictionaryTypesTable;
 use App\Models\DictionaryType;
@@ -51,7 +52,7 @@ class DictionaryTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ItemsRelationManager::class,
         ];
     }
 
