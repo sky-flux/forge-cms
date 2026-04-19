@@ -105,3 +105,64 @@ test('users index can filter by role', function (): void {
         ->assertCanSeeTableRecords([$editor])
         ->assertCanNotSeeTableRecords([$admin]);
 });
+
+test('non-super_admin cannot edit a super_admin user', function (): void {
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    $target = User::factory()->create();
+    $target->assignRole('super_admin');
+
+    expect($editor->can('update', $target))->toBeFalse();
+});
+
+test('non-super_admin cannot strip super_admin role from a super_admin user via update', function (): void {
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    $target = User::factory()->create();
+    $target->assignRole('super_admin');
+
+    Livewire::actingAs($editor)
+        ->test(EditUser::class, ['record' => $target->getRouteKey()])
+        ->assertForbidden();
+});
+
+test('super_admin can edit any user including other super_admins', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $other = User::factory()->create();
+    $other->assignRole('super_admin');
+
+    expect($admin->can('update', $other))->toBeTrue();
+});
+
+test('non-super_admin cannot delete a super_admin user', function (): void {
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    $target = User::factory()->create();
+    $target->assignRole('super_admin');
+
+    expect($editor->can('delete', $target))->toBeFalse();
+});
+
+test('non-super_admin cannot grant super_admin role to a regular user via the form', function (): void {
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    $target = User::factory()->create();
+
+    Livewire::actingAs($editor)
+        ->test(EditUser::class, ['record' => $target->getRouteKey()])
+        ->fillForm([
+            'name' => $target->name,
+            'email' => $target->email,
+            'roles' => [Role::findByName('super_admin')->id, Role::findByName('admin')->id],
+        ])
+        ->call('save');
+
+    $target->refresh();
+    expect($target->hasRole('super_admin'))->toBeFalse();
+});
