@@ -31,7 +31,7 @@ class DictionaryTypeResource extends Resource
 
     protected static ?string $pluralModelLabel = '字典类型';
 
-    protected static ?string $slug = 'system/dictionaries';
+    protected static ?string $slug = 'dicts';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

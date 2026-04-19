@@ -27,7 +27,7 @@ class SystemSettings extends Page
 
     protected static ?string $title = '配置';
 
-    protected static ?string $slug = 'system/settings';
+    protected static ?string $slug = 'settings';
 
     protected string $view = 'filament.pages.system-settings';
 
