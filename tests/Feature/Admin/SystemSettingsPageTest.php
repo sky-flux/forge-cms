@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Pages\SystemSettings;
 use App\Models\User;
+use App\Settings\BackupSettings;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
@@ -65,11 +66,14 @@ test('saving the form persists GeneralSettings values', function (): void {
     Livewire::actingAs($admin)
         ->test(SystemSettings::class)
         ->fillForm([
-            'site_name' => 'Updated Brand',
-            'site_description' => 'New description',
-            'contact_email' => 'hello@example.com',
-            'default_seo_description' => 'New SEO line',
-            'default_og_image' => 'https://example.com/og.png',
+            'general' => [
+                'site_name' => 'Updated Brand',
+                'site_description' => 'New description',
+                'contact_email' => 'hello@example.com',
+                'default_seo_description' => 'New SEO line',
+                'default_og_image' => 'https://example.com/og.png',
+            ],
+            'backup' => app(BackupSettings::class)->toArray(),
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -99,4 +103,34 @@ test('non-super_admin instantiating the SystemSettings Livewire component is rej
     Livewire::actingAs($editor)
         ->test(SystemSettings::class)
         ->assertForbidden();
+});
+
+test('system settings page saves backup tab values', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(SystemSettings::class)
+        ->fillForm([
+            'general' => app(GeneralSettings::class)->toArray(),
+            'backup' => [
+                'enabled' => true,
+                'destination_disk' => 'local',
+                'include_storage_files' => false,
+                'keep_daily_days' => 14,
+                'keep_weekly_weeks' => 8,
+                'keep_monthly_months' => 6,
+                'notify_email' => 'ops@example.com',
+                'schedule_hour' => 3,
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    app()->forgetInstance(BackupSettings::class);
+    $reloaded = app(BackupSettings::class);
+    expect($reloaded->enabled)->toBeTrue()
+        ->and($reloaded->keep_daily_days)->toBe(14)
+        ->and($reloaded->notify_email)->toBe('ops@example.com')
+        ->and($reloaded->schedule_hour)->toBe(3);
 });
