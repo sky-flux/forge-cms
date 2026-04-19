@@ -6,15 +6,23 @@ import { show as postShow, index as postsIndex } from '@/routes/posts';
 interface Props {
     homepage: Page | null;
     latestPosts: Post[];
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function HomePage({ homepage, latestPosts }: Props) {
+export default function HomePage({ homepage, latestPosts, canonical, ogImage }: Props) {
+    const seoTitle = homepage?.seoTitle ?? homepage?.title ?? 'Home';
+    const seoDescription = homepage?.seoDescription ?? null;
+
     return (
         <>
-            <Head title={homepage?.seoTitle ?? homepage?.title ?? 'Home'}>
-                {homepage?.seoDescription && (
-                    <meta name="description" content={homepage.seoDescription} />
-                )}
+            <Head title={seoTitle}>
+                {seoDescription && <meta name="description" content={seoDescription} />}
+                <meta property="og:title" content={seoTitle} />
+                {seoDescription && <meta property="og:description" content={seoDescription} />}
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
             </Head>
             <main className="mx-auto max-w-4xl px-4 py-12">
                 {homepage ? (

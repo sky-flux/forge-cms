@@ -10,9 +10,11 @@ interface Props {
     post: Post & {
         comments: Comment[];
     };
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function PostsShow({ post }: Props) {
+export default function PostsShow({ post, canonical, ogImage }: Props) {
     const page = usePage<{ auth?: { user: { id: number } | null } }>();
     const authenticated = !!page.props.auth?.user;
 
@@ -25,6 +27,9 @@ export default function PostsShow({ post }: Props) {
                 )}
                 <meta property="og:title" content={post.title} />
                 {post.excerpt && <meta property="og:description" content={post.excerpt} />}
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
             </Head>
             <main className="mx-auto max-w-3xl px-4 py-12">
                 <nav className="mb-8">

@@ -6,12 +6,24 @@ import { show as postShow } from '@/routes/posts';
 interface Props {
     category: Category;
     posts: Paginated<Post>;
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function CategoriesShow({ category, posts }: Props) {
+export default function CategoriesShow({ category, posts, canonical, ogImage }: Props) {
+    const seoTitle = `Category: ${category.name}`;
+    const seoDescription = category.description ?? null;
+
     return (
         <>
-            <Head title={`Category: ${category.name}`} />
+            <Head title={seoTitle}>
+                {seoDescription && <meta name="description" content={seoDescription} />}
+                <meta property="og:title" content={seoTitle} />
+                {seoDescription && <meta property="og:description" content={seoDescription} />}
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
+            </Head>
             <main className="mx-auto max-w-4xl px-4 py-12">
                 <header className="mb-10">
                     <p className="mb-2 text-sm uppercase tracking-wide text-muted-foreground">Category</p>

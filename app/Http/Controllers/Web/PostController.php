@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,6 +27,8 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Index', [
             'posts' => PostResource::collection($posts),
+            'canonical' => route('posts.index'),
+            'ogImage' => app(GeneralSettings::class)->default_og_image,
         ]);
     }
 
@@ -40,8 +43,12 @@ class PostController extends Controller
         ]);
         $post->increment('view_count');
 
+        $featuredUrl = $post->getFirstMediaUrl('featured') ?: null;
+
         return Inertia::render('Posts/Show', [
             'post' => new PostResource($post),
+            'canonical' => route('posts.show', ['post' => $post]),
+            'ogImage' => $featuredUrl ?? app(GeneralSettings::class)->default_og_image,
         ]);
     }
 }

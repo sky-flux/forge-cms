@@ -14,14 +14,22 @@ interface Props {
     query: string | null;
     posts: { data: Post[] };
     pages: { data: PageSummary[] };
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function Search({ query, posts, pages }: Props) {
+export default function Search({ query, posts, pages, canonical, ogImage }: Props) {
     const form = useForm({ q: query ?? '' });
+    const seoTitle = query ? `Search: ${query}` : 'Search';
 
     return (
         <>
-            <Head title={query ? `Search: ${query}` : 'Search'} />
+            <Head title={seoTitle}>
+                <meta property="og:title" content={seoTitle} />
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
+            </Head>
             <main className="mx-auto max-w-3xl px-4 py-12">
                 <h1 className="mb-6 text-3xl font-bold tracking-tight">Search</h1>
 

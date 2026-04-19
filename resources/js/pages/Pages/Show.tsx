@@ -9,9 +9,11 @@ interface Props {
     page: Page & {
         comments: Comment[];
     };
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function PagesShow({ page }: Props) {
+export default function PagesShow({ page, canonical, ogImage }: Props) {
     const inertiaPage = usePage<{ auth?: { user: { id: number } | null } }>();
     const authenticated = !!inertiaPage.props.auth?.user;
 
@@ -24,6 +26,9 @@ export default function PagesShow({ page }: Props) {
                 )}
                 <meta property="og:title" content={page.title} />
                 {page.excerpt && <meta property="og:description" content={page.excerpt} />}
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
             </Head>
             <main className="mx-auto max-w-3xl px-4 py-12">
                 <article>

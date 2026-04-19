@@ -9,6 +9,7 @@ use App\Http\Resources\PageResource;
 use App\Http\Resources\PostResource;
 use App\Models\Page;
 use App\Models\Post;
+use App\Settings\GeneralSettings;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,9 +25,13 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
+        $homepageOgImage = $homepage?->getFirstMediaUrl('featured') ?: null;
+
         return Inertia::render('Home', [
             'homepage' => $homepage ? new PageResource($homepage) : null,
             'latestPosts' => PostResource::collection($latestPosts),
+            'canonical' => route('home'),
+            'ogImage' => $homepageOgImage ?? app(GeneralSettings::class)->default_og_image,
         ]);
     }
 }

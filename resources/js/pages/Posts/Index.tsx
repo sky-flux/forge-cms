@@ -4,12 +4,21 @@ import { show as postShow } from '@/routes/posts';
 
 interface Props {
     posts: Paginated<Post>;
+    canonical: string;
+    ogImage: string | null;
 }
 
-export default function PostsIndex({ posts }: Props) {
+export default function PostsIndex({ posts, canonical, ogImage }: Props) {
+    const seoTitle = 'Posts';
+
     return (
         <>
-            <Head title="Posts" />
+            <Head title={seoTitle}>
+                <meta property="og:title" content={seoTitle} />
+                <meta property="og:url" content={canonical} />
+                {ogImage && <meta property="og:image" content={ogImage} />}
+                <link rel="canonical" href={canonical} />
+            </Head>
             <main className="mx-auto max-w-4xl px-4 py-12">
                 <h1 className="mb-8 text-3xl font-bold tracking-tight">Posts</h1>
 
