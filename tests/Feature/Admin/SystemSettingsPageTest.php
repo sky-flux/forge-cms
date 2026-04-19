@@ -80,3 +80,23 @@ test('saving the form persists GeneralSettings values', function (): void {
     expect($reloaded->site_name)->toBe('Updated Brand')
         ->and($reloaded->default_og_image)->toBe('https://example.com/og.png');
 });
+
+test('a non-super_admin authenticated user cannot access system settings', function (): void {
+    Role::findOrCreate('admin');
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    $this->actingAs($editor)
+        ->get(SystemSettings::getUrl())
+        ->assertForbidden();
+});
+
+test('non-super_admin instantiating the SystemSettings Livewire component is rejected', function (): void {
+    Role::findOrCreate('admin');
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    Livewire::actingAs($editor)
+        ->test(SystemSettings::class)
+        ->assertForbidden();
+});

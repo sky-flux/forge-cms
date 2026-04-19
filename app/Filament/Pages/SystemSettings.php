@@ -36,6 +36,8 @@ class SystemSettings extends Page
 
     public function mount(): void
     {
+        abort_unless(static::canAccess(), 403);
+
         $this->form->fill(app(GeneralSettings::class)->toArray());
     }
 
@@ -58,6 +60,8 @@ class SystemSettings extends Page
 
     public function save(): void
     {
+        abort_unless(static::canAccess(), 403);
+
         $state = $this->form->getState();
 
         $settings = app(GeneralSettings::class);
