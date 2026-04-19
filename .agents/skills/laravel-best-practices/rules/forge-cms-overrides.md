@@ -117,6 +117,10 @@ Never use `--test`. Reinforced by user-memory rule `TDD cycle — every commit f
 
 `php artisan test --compact` (optionally with `--filter=Name` or a file path). Do not use `./vendor/bin/pest` directly — it bypasses the project's compact output.
 
+### 5.3 Structured log output (stderr channel)
+
+`.env` sets `LOG_CHANNEL=stderr` and `LOG_STDERR_FORMATTER=Monolog\\Formatter\\JsonFormatter`. Every `Log::info/warning/error` call emits a one-line JSON record with `message`, `context`, `level_name`, `channel`, `datetime`. Log calls MUST pass structured context (never string interpolation): `Log::info('post.published', ['post_id' => $post->id, 'user_id' => $user->id])`. Never `Log::info("Post $id published")` — breaks log aggregation queries. Never dump a whole Eloquent model into context — log IDs + the specific fields you care about.
+
 ## 6. Intentional gaps — what `docs/laravel.md` prescribes that is NOT yet live
 
 These are **direction-of-travel**, not enforced state. Do not cite them as "project convention" when reviewing someone else's work; do implement them the first time a real need arises and then move the item up into the sections above.
@@ -127,7 +131,6 @@ These are **direction-of-travel**, not enforced state. Do not cite them as "proj
 | Business-domain `Action` classes (§3.2) | `app/Actions/Fortify/` only | §3.1 above |
 | `Api/` REST controllers + `App\Http\Resources` API versioning (§2.2) | not present | §3.1 above |
 | Queue `Job`s with tries/backoff (§7.1) | no `app/Jobs/` | New §7 |
-| `JsonFormatter` on stderr log channel (§9.1) | `LOG_CHANNEL=stderr` is active in `.env`; `LOG_STDERR_FORMATTER` is unset so Monolog's default LineFormatter is used, not JSON. | New §8 |
 | Rector / Larastan in CI (§12) | packages installed, CI integration TBD | §5 above |
 
 When you make any of these live, move the row out of this table and add an "enforced" rule above with file:line citations.
