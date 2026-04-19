@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\Categories\CategoryResource;
+use App\Filament\Resources\Comments\CommentResource;
+use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Posts\PostResource;
+use App\Filament\Resources\Tags\TagResource;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Spatie\Permission\Models\Role;
@@ -47,4 +52,17 @@ test('roles resource appears under the 系统 navigation group', function (): vo
 
     expect(class_exists($resource))->toBeTrue()
         ->and($resource::getNavigationGroup())->toBe('系统');
+});
+
+test('content resources are grouped under 内容 with stable sort order', function (): void {
+    expect(PostResource::getNavigationGroup())->toBe('内容')
+        ->and(PostResource::getNavigationSort())->toBe(1)
+        ->and(PageResource::getNavigationGroup())->toBe('内容')
+        ->and(PageResource::getNavigationSort())->toBe(2)
+        ->and(CategoryResource::getNavigationGroup())->toBe('内容')
+        ->and(CategoryResource::getNavigationSort())->toBe(3)
+        ->and(TagResource::getNavigationGroup())->toBe('内容')
+        ->and(TagResource::getNavigationSort())->toBe(4)
+        ->and(CommentResource::getNavigationGroup())->toBe('内容')
+        ->and(CommentResource::getNavigationSort())->toBe(5);
 });

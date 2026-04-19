@@ -20,6 +20,10 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
+    protected static string|\UnitEnum|null $navigationGroup = '内容';
+
+    protected static ?int $navigationSort = 4;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
     protected static ?string $recordTitleAttribute = 'name';
