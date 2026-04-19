@@ -26,6 +26,8 @@ Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show'
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
+Route::feeds();
+
 Route::post('/posts/{post:uuid}/comments', [CommentController::class, 'storeForPost'])
     ->middleware(['throttle:3,1', ProtectAgainstSpam::class])
     ->name('posts.comments.store');

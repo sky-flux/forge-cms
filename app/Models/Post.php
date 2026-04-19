@@ -8,6 +8,7 @@ use App\Enums\CommentStatus;
 use App\Enums\PostStatus;
 use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,12 +19,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Feed\Feedable;
+use Spatie\Feed\FeedItem;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Post extends Model implements HasMedia
+class Post extends Model implements Feedable, HasMedia
 {
     /** @use HasFactory<PostFactory> */
     use HasFactory, HasSlug, HasUuids, InteractsWithMedia, LogsActivity, Searchable, SoftDeletes;
@@ -139,5 +142,31 @@ class Post extends Model implements HasMedia
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
             ->setDescriptionForEvent(fn (string $eventName): string => "post.{$eventName}");
+    }
+
+    /**
+     * Return the most recent published posts to expose via the RSS feed.
+     *
+     * @return Collection<int, static>
+     */
+    public static function getFeedItems(): Collection
+    {
+        return static::query()
+            ->published()
+            ->with('user')
+            ->latest('published_at')
+            ->limit(50)
+            ->get();
+    }
+
+    public function toFeedItem(): FeedItem
+    {
+        return FeedItem::create()
+            ->id($this->getRouteKey())
+            ->title((string) $this->title)
+            ->summary(strip_tags((string) ($this->excerpt ?? $this->title)))
+            ->updated($this->published_at ?? $this->updated_at ?? now())
+            ->link(route('posts.show', $this))
+            ->authorName((string) ($this->user?->name ?? ''));
     }
 }

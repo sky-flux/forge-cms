@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+use App\Models\Post;
+
 return [
     'feeds' => [
         'main' => [
@@ -11,15 +14,15 @@ return [
              * You can also pass an argument to that method. Note that their key must be the name of the parameter:
              * [App\Model::class, 'getAllFeedItems', 'parameterName' => 'argument']
              */
-            'items' => '',
+            'items' => [Post::class, 'getFeedItems'],
 
             /*
              * The feed will be available on this url.
              */
-            'url' => '',
+            'url' => '/feed.xml',
 
-            'title' => 'My feed',
-            'description' => 'The description of the feed.',
+            'title' => 'Forge CMS',
+            'description' => 'Latest posts from Forge CMS.',
             'language' => 'en-US',
 
             /*
@@ -32,18 +35,18 @@ return [
             /*
              * The format of the feed. Acceptable values are 'rss', 'atom', or 'json'.
              */
-            'format' => 'atom',
+            'format' => 'rss',
 
             /*
              * The view that will render the feed.
              */
-            'view' => 'feed::atom',
+            'view' => 'feed::rss',
 
             /*
              * The mime type to be used in the <link> tag. Set to an empty string to automatically
              * determine the correct value.
              */
-            'type' => '',
+            'type' => 'application/rss+xml',
 
             /*
              * The content type for the feed response. Set to an empty string to automatically
