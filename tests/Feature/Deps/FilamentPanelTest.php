@@ -26,3 +26,17 @@ test('denies panel access to a regular user in production', function (): void {
 
     $this->actingAs($user)->get('/admin')->assertForbidden();
 });
+
+test('admin panel declares 内容 and 系统 navigation groups in that order', function (): void {
+    $panel = filament()->getPanel('admin');
+
+    $groupKeys = array_values(array_map(
+        fn ($g) => is_string($g) ? $g : $g->getLabel(),
+        $panel->getNavigationGroups(),
+    ));
+
+    expect($groupKeys)->toContain('内容')
+        ->and($groupKeys)->toContain('系统')
+        ->and(array_search('内容', $groupKeys, true))
+        ->toBeLessThan(array_search('系统', $groupKeys, true));
+});
