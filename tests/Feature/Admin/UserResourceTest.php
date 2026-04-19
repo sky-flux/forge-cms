@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
 use Livewire\Livewire;
@@ -74,4 +75,33 @@ test('editing a user persists role changes without changing password unless prov
     $target->refresh();
     expect($target->hasRole('admin'))->toBeTrue()
         ->and(Hash::check('keep-this-pw', $target->password))->toBeTrue();
+});
+
+test('users index lists existing users with their primary role', function (): void {
+    $admin = User::factory()->create(['name' => 'Adam']);
+    $admin->assignRole('super_admin');
+
+    $editor = User::factory()->create(['name' => 'Edie']);
+    $editor->assignRole('admin');
+
+    Livewire::actingAs($admin)
+        ->test(ListUsers::class)
+        ->assertCanSeeTableRecords([$admin, $editor])
+        ->assertTableColumnExists('name')
+        ->assertTableColumnExists('email')
+        ->assertTableColumnExists('roles.name');
+});
+
+test('users index can filter by role', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $editor = User::factory()->create();
+    $editor->assignRole('admin');
+
+    Livewire::actingAs($admin)
+        ->test(ListUsers::class)
+        ->filterTable('roles', Role::findByName('admin')->id)
+        ->assertCanSeeTableRecords([$editor])
+        ->assertCanNotSeeTableRecords([$admin]);
 });
