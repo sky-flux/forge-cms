@@ -6,7 +6,9 @@ namespace App\Filament\Pages;
 
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
+use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\MediaUploadSettings;
 use App\Settings\SeoSettings;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -50,6 +52,8 @@ class SystemSettings extends Page
             'backup' => app(BackupSettings::class)->toArray(),
             'comments' => app(CommentSettings::class)->toArray(),
             'seo' => app(SeoSettings::class)->toArray(),
+            'media_upload' => app(MediaUploadSettings::class)->toArray(),
+            'feed' => app(FeedSettings::class)->toArray(),
         ];
 
         $this->form->fill($this->data);
@@ -148,6 +152,34 @@ class SystemSettings extends Page
                                 Toggle::make('sitemap_include_categories')->label('Sitemap 包含分类页'),
                                 Toggle::make('sitemap_include_tags')->label('Sitemap 包含标签页'),
                             ]),
+                        Tab::make('媒体上传')
+                            ->statePath('media_upload')
+                            ->schema([
+                                TextInput::make('max_upload_size_mb')->numeric()->minValue(1)->maxValue(500)->label('单文件最大 MB'),
+                                TextInput::make('allowed_mime_types_csv')->required()->maxLength(1024)->label('允许的 MIME 类型(逗号分隔)'),
+                                Toggle::make('auto_convert_to_webp')->label('自动转 WebP'),
+                                TextInput::make('image_quality')->numeric()->minValue(1)->maxValue(100)->label('图片质量 (1-100)'),
+                            ]),
+                        Tab::make('RSS / Sitemap')
+                            ->statePath('feed')
+                            ->schema([
+                                TextInput::make('items_per_feed')->numeric()->minValue(10)->maxValue(500)->label('Feed 条目数'),
+                                TextInput::make('feed_cache_ttl_minutes')->numeric()->minValue(0)->maxValue(1440)->label('Feed 缓存分钟 (0=不缓存)'),
+                                Toggle::make('include_excerpts_in_feed')->label('Feed 包含摘要'),
+                                TextInput::make('sitemap_default_priority')->numeric()->step(0.1)->minValue(0)->maxValue(1)->label('Sitemap 默认权重 (0-1)'),
+                                Select::make('sitemap_change_frequency')
+                                    ->options([
+                                        'always' => 'always',
+                                        'hourly' => 'hourly',
+                                        'daily' => 'daily',
+                                        'weekly' => 'weekly',
+                                        'monthly' => 'monthly',
+                                        'yearly' => 'yearly',
+                                        'never' => 'never',
+                                    ])
+                                    ->required()
+                                    ->label('Sitemap 更新频率'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -183,6 +215,18 @@ class SystemSettings extends Page
         }
         $seo->save();
 
+        $mediaUpload = app(MediaUploadSettings::class);
+        foreach (($state['media_upload'] ?? []) as $key => $value) {
+            $mediaUpload->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $mediaUpload->save();
+
+        $feed = app(FeedSettings::class);
+        foreach (($state['feed'] ?? []) as $key => $value) {
+            $feed->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $feed->save();
+
         Notification::make()
             ->title('Settings saved')
             ->success()
@@ -216,12 +260,18 @@ class SystemSettings extends Page
         return match ($key) {
             // Integer-typed properties across settings classes.
             'keep_daily_days', 'keep_weekly_weeks', 'keep_monthly_months',
-            'schedule_hour', 'max_depth', 'throttle_per_minute' => (int) $value,
+            'schedule_hour', 'max_depth', 'throttle_per_minute',
+            'max_upload_size_mb', 'image_quality',
+            'items_per_feed', 'feed_cache_ttl_minutes' => (int) $value,
 
             // Boolean-typed properties across settings classes.
             'enabled', 'include_storage_files',
             'allow_guests', 'notify_author_on_reply', 'honeypot_enabled',
-            'sitemap_include_categories', 'sitemap_include_tags' => (bool) $value,
+            'sitemap_include_categories', 'sitemap_include_tags',
+            'auto_convert_to_webp', 'include_excerpts_in_feed' => (bool) $value,
+
+            // Float-typed properties.
+            'sitemap_default_priority' => (float) $value,
 
             default => $value,
         };

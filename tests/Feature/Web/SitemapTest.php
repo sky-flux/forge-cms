@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Settings\FeedSettings;
 use App\Settings\SeoSettings;
 
 test('sitemap.xml returns a valid sitemap covering home, posts, pages, categories, tags', function (): void {
@@ -60,4 +61,17 @@ test('sitemap honors SeoSettings sitemap_include_tags toggle', function (): void
 
     $body = $this->get('/sitemap.xml')->getContent();
     expect($body)->not->toContain(route('tags.show', ['tag' => $tag]));
+});
+
+test('sitemap urls carry FeedSettings priority + changefreq', function (): void {
+    Post::factory()->published()->create();
+
+    $s = app(FeedSettings::class);
+    $s->sitemap_default_priority = 0.9;
+    $s->sitemap_change_frequency = 'daily';
+    $s->save();
+
+    $body = $this->get('/sitemap.xml')->getContent();
+    expect($body)->toContain('<priority>0.9</priority>')
+        ->and($body)->toContain('<changefreq>daily</changefreq>');
 });

@@ -6,7 +6,9 @@ use App\Filament\Pages\SystemSettings;
 use App\Models\User;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
+use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\MediaUploadSettings;
 use App\Settings\SeoSettings;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
@@ -185,4 +187,37 @@ test('system settings page saves comment policy tab', function (): void {
     expect($reloaded->default_status)->toBe('Approved')
         ->and($reloaded->allow_guests)->toBeFalse()
         ->and($reloaded->max_depth)->toBe(2);
+});
+
+test('system settings page saves media upload + feed tabs', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(SystemSettings::class)
+        ->fillForm([
+            'media_upload' => [
+                'max_upload_size_mb' => 25,
+                'allowed_mime_types_csv' => 'image/jpeg,image/png',
+                'auto_convert_to_webp' => true,
+                'image_quality' => 70,
+            ],
+            'feed' => [
+                'items_per_feed' => 100,
+                'feed_cache_ttl_minutes' => 30,
+                'include_excerpts_in_feed' => false,
+                'sitemap_default_priority' => 0.8,
+                'sitemap_change_frequency' => 'daily',
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    app()->forgetInstance(MediaUploadSettings::class);
+    app()->forgetInstance(FeedSettings::class);
+    expect(app(MediaUploadSettings::class)->image_quality)->toBe(70)
+        ->and(app(MediaUploadSettings::class)->auto_convert_to_webp)->toBeTrue()
+        ->and(app(FeedSettings::class)->items_per_feed)->toBe(100)
+        ->and(app(FeedSettings::class)->sitemap_default_priority)->toBe(0.8)
+        ->and(app(FeedSettings::class)->sitemap_change_frequency)->toBe('daily');
 });

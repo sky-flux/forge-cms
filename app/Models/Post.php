@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CommentStatus;
 use App\Enums\PostStatus;
+use App\Settings\FeedSettings;
 use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -155,16 +156,21 @@ class Post extends Model implements Feedable, HasMedia
             ->published()
             ->with('user')
             ->latest('published_at')
-            ->limit(50)
+            ->limit(app(FeedSettings::class)->items_per_feed)
             ->get();
     }
 
     public function toFeedItem(): FeedItem
     {
+        $feedSettings = app(FeedSettings::class);
+        $summary = $feedSettings->include_excerpts_in_feed
+            ? strip_tags((string) ($this->excerpt ?? $this->title))
+            : (string) $this->title;
+
         return FeedItem::create()
             ->id($this->getRouteKey())
             ->title((string) $this->title)
-            ->summary(strip_tags((string) ($this->excerpt ?? $this->title)))
+            ->summary($summary)
             ->updated($this->published_at ?? $this->updated_at ?? now())
             ->link(route('posts.show', $this))
             ->authorName((string) ($this->user?->name ?? ''));

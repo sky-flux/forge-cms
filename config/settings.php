@@ -2,7 +2,9 @@
 
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
+use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\MediaUploadSettings;
 use App\Settings\SeoSettings;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
@@ -22,6 +24,8 @@ return [
         BackupSettings::class,
         CommentSettings::class,
         SeoSettings::class,
+        MediaUploadSettings::class,
+        FeedSettings::class,
     ],
 
     /*
