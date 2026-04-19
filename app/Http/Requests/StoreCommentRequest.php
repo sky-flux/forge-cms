@@ -6,19 +6,13 @@ namespace App\Http\Requests;
 
 use App\Enums\CommentStatus;
 use App\Models\Comment;
+use App\Settings\CommentSettings;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreCommentRequest extends FormRequest
 {
-    /**
-     * Maximum reply depth allowed (root comment = depth 1; a reply to the
-     * root is depth 2; a reply to that is depth 3). Submissions that would
-     * produce a comment at depth > 3 are rejected.
-     */
-    private const int MAX_DEPTH = 3;
-
     public function authorize(): bool
     {
         return true;
@@ -62,9 +56,11 @@ class StoreCommentRequest extends FormRequest
                     return;
                 }
 
+                $maxDepth = app(CommentSettings::class)->max_depth;
+
                 $depth = 1;
                 $cursor = $parent;
-                while ($cursor->parent_id !== null && $depth < self::MAX_DEPTH + 1) {
+                while ($cursor->parent_id !== null && $depth < $maxDepth + 1) {
                     $next = Comment::find($cursor->parent_id);
                     if ($next === null) {
                         break;
@@ -73,10 +69,10 @@ class StoreCommentRequest extends FormRequest
                     $depth++;
                 }
 
-                if ($depth >= self::MAX_DEPTH) {
+                if ($depth >= $maxDepth) {
                     $validator->errors()->add(
                         'parent_id',
-                        'Replies beyond depth '.self::MAX_DEPTH.' are not allowed.',
+                        'Replies beyond depth '.$maxDepth.' are not allowed.',
                     );
                 }
             },

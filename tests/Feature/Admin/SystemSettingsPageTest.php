@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Filament\Pages\SystemSettings;
 use App\Models\User;
 use App\Settings\BackupSettings;
+use App\Settings\CommentSettings;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
@@ -133,4 +134,30 @@ test('system settings page saves backup tab values', function (): void {
         ->and($reloaded->keep_daily_days)->toBe(14)
         ->and($reloaded->notify_email)->toBe('ops@example.com')
         ->and($reloaded->schedule_hour)->toBe(3);
+});
+
+test('system settings page saves comment policy tab', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(SystemSettings::class)
+        ->fillForm([
+            'comments' => [
+                'default_status' => 'Approved',
+                'allow_guests' => false,
+                'max_depth' => 2,
+                'throttle_per_minute' => 10,
+                'notify_author_on_reply' => true,
+                'honeypot_enabled' => false,
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    app()->forgetInstance(CommentSettings::class);
+    $reloaded = app(CommentSettings::class);
+    expect($reloaded->default_status)->toBe('Approved')
+        ->and($reloaded->allow_guests)->toBeFalse()
+        ->and($reloaded->max_depth)->toBe(2);
 });

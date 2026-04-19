@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Settings\BackupSettings;
+use App\Settings\CommentSettings;
 use App\Settings\GeneralSettings;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -46,6 +47,7 @@ class SystemSettings extends Page
         $this->data = [
             'general' => app(GeneralSettings::class)->toArray(),
             'backup' => app(BackupSettings::class)->toArray(),
+            'comments' => app(CommentSettings::class)->toArray(),
         ];
 
         $this->form->fill($this->data);
@@ -106,6 +108,31 @@ class SystemSettings extends Page
                                     ->maxValue(23)
                                     ->label('每日执行时刻 (0-23)'),
                             ]),
+                        Tab::make('评论策略')
+                            ->statePath('comments')
+                            ->schema([
+                                Select::make('default_status')
+                                    ->options([
+                                        'Pending' => 'Pending (审核)',
+                                        'Approved' => 'Approved (自动通过)',
+                                        'Trash' => 'Trash (丢弃)',
+                                    ])
+                                    ->required()
+                                    ->label('默认状态'),
+                                Toggle::make('allow_guests')->label('允许匿名评论'),
+                                TextInput::make('max_depth')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(5)
+                                    ->label('最大嵌套深度'),
+                                TextInput::make('throttle_per_minute')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(60)
+                                    ->label('每分钟限流'),
+                                Toggle::make('notify_author_on_reply')->label('作者收到回复时通知'),
+                                Toggle::make('honeypot_enabled')->label('启用蜜罐防爬'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -125,9 +152,15 @@ class SystemSettings extends Page
 
         $backup = app(BackupSettings::class);
         foreach (($state['backup'] ?? []) as $key => $value) {
-            $backup->{$key} = $this->castBackupValue($key, $value);
+            $backup->{$key} = $this->castSettingsValue($key, $value);
         }
         $backup->save();
+
+        $comments = app(CommentSettings::class);
+        foreach (($state['comments'] ?? []) as $key => $value) {
+            $comments->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $comments->save();
 
         Notification::make()
             ->title('Settings saved')
@@ -151,16 +184,23 @@ class SystemSettings extends Page
     }
 
     /**
-     * Cast form-submitted backup values to the scalar types declared on BackupSettings.
+     * Cast form-submitted values to the scalar types declared on the target
+     * Settings classes (BackupSettings, CommentSettings, ...).
      *
      * Filament numeric inputs round-trip through HTML and come back as strings
-     * or floats, which fails the typed properties on BackupSettings.
+     * or floats, which fails the typed properties on Settings classes.
      */
-    private function castBackupValue(string $key, mixed $value): mixed
+    private function castSettingsValue(string $key, mixed $value): mixed
     {
         return match ($key) {
-            'keep_daily_days', 'keep_weekly_weeks', 'keep_monthly_months', 'schedule_hour' => (int) $value,
-            'enabled', 'include_storage_files' => (bool) $value,
+            // Integer-typed properties across settings classes.
+            'keep_daily_days', 'keep_weekly_weeks', 'keep_monthly_months',
+            'schedule_hour', 'max_depth', 'throttle_per_minute' => (int) $value,
+
+            // Boolean-typed properties across settings classes.
+            'enabled', 'include_storage_files',
+            'allow_guests', 'notify_author_on_reply', 'honeypot_enabled' => (bool) $value,
+
             default => $value,
         };
     }
