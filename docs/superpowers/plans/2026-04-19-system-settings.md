@@ -6,7 +6,7 @@
 
 **Architecture:** `spatie/laravel-settings` provides typed setting classes persisted to a `settings` table via a settings migration. A custom Filament Page (`SystemSettings`) hydrates a `GeneralSettings` instance into a Form schema on mount and persists on save. Single-record by design (no Resource), no tabs in v1 (single group). Authorization via a Page-level `canAccess()` calling `Gate::allows('manage_settings')` — a Shield-style permission seeded into the `super_admin` role.
 
-**Tech Stack:** Laravel 13, Filament 4 Pages, `spatie/laravel-settings` v3+, Pest 4. Depends on Foundation plan having merged.
+**Tech Stack:** Laravel 13, Filament 5 Pages, `spatie/laravel-settings` v3+, Pest 4. Depends on Foundation plan having merged.
 
 **Spec:** `docs/superpowers/specs/2026-04-19-system-admin-modules.md` §5.4
 
@@ -53,7 +53,7 @@ Use Boost MCP `search-docs`:
 queries=["spatie laravel settings install", "spatie laravel settings filament", "filament page form schema mount save"]
 ```
 
-- [ ] **Step 2: Confirm Filament 4 Page API**
+- [ ] **Step 2: Confirm Filament 5 Page API**
 
 Inspect a sibling Page if any exists. Currently `app/Filament/Pages/` does not exist. Create a quick reference by inspecting the vendor Dashboard:
 ```bash
@@ -588,7 +588,7 @@ vendor/bin/pint --dirty --format agent
 - [ ] **Step 8: Dispatch code reviewer**
 
 Prompt:
-> Review the new Filament Page `SystemSettings` and its blade view. Verify: (a) Page extends Filament 4 base correctly with HasSchemas + InteractsWithSchemas, (b) `mount()` hydrates from `app(GeneralSettings::class)->toArray()` — and that this method exists on Spatie's Settings class (it does, but confirm), (c) `save()` writes back property-by-property and calls `->save()` on the settings instance (NOT a static facade), (d) `canAccess()` is the authoritative gate — there is no other route binding that could leak the page, (e) the slug `'system-settings'` makes the URL `/admin/system-settings`, (f) the test for nav group asserts on the public `getNavigationGroup()` accessor (not the protected property). Reference forge-cms-overrides.md.
+> Review the new Filament Page `SystemSettings` and its blade view. Verify: (a) Page extends Filament 5 base correctly with HasSchemas + InteractsWithSchemas, (b) `mount()` hydrates from `app(GeneralSettings::class)->toArray()` — and that this method exists on Spatie's Settings class (it does, but confirm), (c) `save()` writes back property-by-property and calls `->save()` on the settings instance (NOT a static facade), (d) `canAccess()` is the authoritative gate — there is no other route binding that could leak the page, (e) the slug `'system-settings'` makes the URL `/admin/system-settings`, (f) the test for nav group asserts on the public `getNavigationGroup()` accessor (not the protected property). Reference forge-cms-overrides.md.
 
 - [ ] **Step 9: Fix flagged issues** (loop with tests + pint).
 

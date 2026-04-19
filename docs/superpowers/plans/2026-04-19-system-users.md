@@ -4,9 +4,9 @@
 
 **Goal:** Add a Filament `UserResource` under the 「系统」 nav group so super_admins can list, create, edit, and (soft-)delete users plus assign Spatie roles, with a defense-in-depth policy that prevents non-super_admins from demoting super_admins.
 
-**Architecture:** Standard Filament 4 split-file Resource (`Resource` + `Pages/` + `Schemas/` + `Tables/`). Roles come from the existing `roles()` relation on `User` (Spatie). Authorization via a Shield-generated `UserPolicy` plus a custom `update()` rule. No model changes (User already implements FilamentUser, has HasRoles, etc.).
+**Architecture:** Standard Filament 5 split-file Resource (`Resource` + `Pages/` + `Schemas/` + `Tables/`). Roles come from the existing `roles()` relation on `User` (Spatie). Authorization via a Shield-generated `UserPolicy` plus a custom `update()` rule. No model changes (User already implements FilamentUser, has HasRoles, etc.).
 
-**Tech Stack:** Filament 4, Spatie Permission 7, Filament Shield 4, Pest 4. Depends on the Foundation plan having merged.
+**Tech Stack:** Filament 5, Spatie Permission 7, Filament Shield 4, Pest 4. Depends on the Foundation plan having merged.
 
 **Spec:** `docs/superpowers/specs/2026-04-19-system-admin-modules.md` §5.2
 
@@ -187,7 +187,7 @@ vendor/bin/pint --dirty --format agent
 - [ ] **Step 8: Dispatch code reviewer**
 
 Prompt:
-> Review unstaged diff: a new Filament UserResource was scaffolded under app/Filament/Resources/Users/. Confirm: (a) follows the project's Filament 4 split-file pattern (CategoryResource is the canonical sibling), (b) `$navigationGroup`/`$navigationSort`/labels match Plan §5.2, (c) the temporary `canAccess() { return true; }` is clearly marked for replacement in Task 4, (d) tests use `test()` + `$this->actingAs()` per `forge-cms-overrides.md` §4.1, no `Pest\Laravel` functional imports.
+> Review unstaged diff: a new Filament UserResource was scaffolded under app/Filament/Resources/Users/. Confirm: (a) follows the project's Filament 5 split-file pattern (CategoryResource is the canonical sibling), (b) `$navigationGroup`/`$navigationSort`/labels match Plan §5.2, (c) the temporary `canAccess() { return true; }` is clearly marked for replacement in Task 4, (d) tests use `test()` + `$this->actingAs()` per `forge-cms-overrides.md` §4.1, no `Pest\Laravel` functional imports.
 
 - [ ] **Step 9: Fix flagged issues** (loop with tests + pint).
 
@@ -763,4 +763,4 @@ git commit -m "feat(admin): UserPolicy + role-escalation guards (policy, select 
 - ✅ Implementer subagents stop at Pint; main session commits.
 - ✅ One commit per task = four commits (Tasks 2/3/4/5).
 - ✅ Temporary `canAccess` override is explicitly removed in Task 5 — no orphan code.
-- ✅ Test FQCNs match Filament 4 generated structure.
+- ✅ Test FQCNs match Filament 5 generated structure.

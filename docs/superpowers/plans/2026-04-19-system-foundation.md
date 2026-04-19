@@ -6,7 +6,7 @@
 
 **Architecture:** Edit `app/Providers/Filament/AdminPanelProvider.php` to declare nav-group order and apply `FilamentShieldPlugin::make()->navigationGroup('系统')`. Add a `$navigationGroup = '内容'` property to each of the 5 existing Filament resources. New System modules (Users, Dictionary, Settings — separate plans) declare `'系统'` themselves via the same property pattern.
 
-**Tech Stack:** Filament 4, bezhansalleh/filament-shield 4, spatie/laravel-permission 7, Pest 4.
+**Tech Stack:** Filament 5, bezhansalleh/filament-shield 4, spatie/laravel-permission 7, Pest 4.
 
 **Spec:** `docs/superpowers/specs/2026-04-19-system-admin-modules.md`
 
@@ -151,7 +151,7 @@ vendor/bin/pint --dirty --format agent
 - [ ] **Step 6: Dispatch code reviewer**
 
 Main session only — dispatch `pr-review-toolkit:code-reviewer` subagent with prompt:
-> Review the unstaged diff. Focus: (a) navigation group ordering matches the project's Filament 4 conventions, (b) test asserts the right surface (label, not internal object identity, ordering not strict equality), (c) no Octane-unsafe patterns introduced. Reference `.claude/skills/laravel-best-practices/rules/forge-cms-overrides.md`.
+> Review the unstaged diff. Focus: (a) navigation group ordering matches the project's Filament 5 conventions, (b) test asserts the right surface (label, not internal object identity, ordering not strict equality), (c) no Octane-unsafe patterns introduced. Reference `.claude/skills/laravel-best-practices/rules/forge-cms-overrides.md`.
 
 - [ ] **Step 7: Fix every flagged issue**
 
@@ -345,7 +345,7 @@ vendor/bin/pint --dirty --format agent
 - [ ] **Step 6: Dispatch code reviewer**
 
 Prompt:
-> Review unstaged diff. Five Filament Resources got `$navigationGroup` + `$navigationSort` properties. Confirm: (a) property type signature matches Filament 4 (`string|\UnitEnum|null`), (b) sort order is sensible for editorial UX (Posts → Pages → Categories → Tags → Comments), (c) no other code paths broke (existing tests pass). Reference forge-cms-overrides.md.
+> Review unstaged diff. Five Filament Resources got `$navigationGroup` + `$navigationSort` properties. Confirm: (a) property type signature matches Filament 5 (`string|\UnitEnum|null`), (b) sort order is sensible for editorial UX (Posts → Pages → Categories → Tags → Comments), (c) no other code paths broke (existing tests pass). Reference forge-cms-overrides.md.
 
 - [ ] **Step 7: Fix flagged issues** (loop with tests + pint).
 

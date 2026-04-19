@@ -6,7 +6,7 @@
 
 **Architecture:** Two tables — `dictionary_types(code, name, remark)` parent and `dictionary_items(type_id, label, value, sort, is_default, status)` children. Filament `DictionaryTypeResource` with a nested `DictionaryItemsRelationManager` for item CRUD. A static helper `Dictionary::items('post_visibility')` returns a `Collection<DictionaryItem>` from `Cache::rememberForever`, busted on item save/delete via Eloquent model events.
 
-**Tech Stack:** Laravel 13 Eloquent, Filament 4 (Resource + RelationManager), Spatie Permission 7, Filament Shield 4, Pest 4. Depends on Foundation plan having merged.
+**Tech Stack:** Laravel 13 Eloquent, Filament 5 (Resource + RelationManager), Spatie Permission 7, Filament Shield 4, Pest 4. Depends on Foundation plan having merged.
 
 **Spec:** `docs/superpowers/specs/2026-04-19-system-admin-modules.md` §5.3
 
@@ -834,7 +834,7 @@ vendor/bin/pint --dirty --format agent
 - [ ] **Step 8: Dispatch code reviewer**
 
 Prompt:
-> Review the new ItemsRelationManager. Verify: (a) per-type uniqueness rule on `value` works for both create and edit (note the `ignore()` for edit), (b) defaults sort by `sort`, (c) all columns/actions match the sibling Filament 4 patterns from PostsTable, (d) `getMountedTableActionRecord()` is the correct accessor for the currently-edited record. If a different accessor is canonical in Filament 4, flag it.
+> Review the new ItemsRelationManager. Verify: (a) per-type uniqueness rule on `value` works for both create and edit (note the `ignore()` for edit), (b) defaults sort by `sort`, (c) all columns/actions match the sibling Filament 5 patterns from PostsTable, (d) `getMountedTableActionRecord()` is the correct accessor for the currently-edited record. If a different accessor is canonical in Filament 5, flag it.
 
 - [ ] **Step 9: Fix flagged issues** (loop).
 
