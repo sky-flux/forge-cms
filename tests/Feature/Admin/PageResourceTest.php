@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\Pages\PageResource;
+use App\Filament\Resources\Pages\Pages\ListPages;
 use App\Models\Page;
 use App\Models\User;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function (): void {
@@ -36,4 +38,18 @@ test('super_admin can render the create form page', function (): void {
 
 test('PageResource binds to the Page model', function (): void {
     expect(PageResource::getModel())->toBe(Page::class);
+});
+
+test('trashed filter exposes soft-deleted pages', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $page = Page::factory()->create();
+    $page->delete();
+
+    Livewire::actingAs($admin)
+        ->test(ListPages::class)
+        ->assertCanNotSeeTableRecords([$page])
+        ->filterTable('trashed', 'with')
+        ->assertCanSeeTableRecords([$page]);
 });

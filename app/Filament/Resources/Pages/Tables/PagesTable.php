@@ -17,6 +17,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PagesTable
@@ -42,6 +43,7 @@ class PagesTable
                     ->sortable(),
             ])
             ->filters([
+                TrashedFilter::make(),
                 SelectFilter::make('status')
                     ->options(PostStatus::class),
                 TernaryFilter::make('is_homepage'),
