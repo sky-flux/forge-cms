@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
@@ -24,7 +25,7 @@ use Spatie\Sluggable\SlugOptions;
 class Page extends Model implements HasMedia
 {
     /** @use HasFactory<PageFactory> */
-    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, LogsActivity, SoftDeletes;
+    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, LogsActivity, Searchable, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'title', 'slug', 'excerpt', 'body_html',
@@ -81,6 +82,28 @@ class Page extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('featured')->singleFile();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
+            'title' => $this->title,
+            'excerpt' => $this->excerpt,
+            'body_html' => strip_tags((string) $this->body_html),
+            'slug' => $this->slug,
+            'status' => $this->status?->value,
+            'published_at' => $this->published_at?->timestamp,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->status === PostStatus::Published;
     }
 
     public function scopePublished(Builder $query): void

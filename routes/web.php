@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\CommentController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\PostController;
+use App\Http\Controllers\Web\SearchController;
 use App\Http\Controllers\Web\TagController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Honeypot\ProtectAgainstSpam;
@@ -22,6 +23,8 @@ Route::get('/pages/{page:slug}', [PageController::class, 'show'])->name('pages.s
 
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
+
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::post('/posts/{post:uuid}/comments', [CommentController::class, 'storeForPost'])
     ->middleware(['throttle:3,1', ProtectAgainstSpam::class])
