@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Settings\SeoSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Middleware;
@@ -45,6 +46,30 @@ class HandleInertiaRequests extends Middleware
                 'user' => fn () => $this->resolveAuthUser($request),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'seo' => fn () => $this->resolveSeoSharedProps(),
+        ];
+    }
+
+    /**
+     * Resolve the SEO / analytics shared props exposed to every Inertia
+     * response.
+     *
+     * Resolved per-request (not captured at middleware boot) so Octane-shared
+     * containers and runtime settings edits take effect on the next visit.
+     *
+     * @return array{google_analytics_id: ?string, google_tag_manager_id: ?string, google_site_verification: ?string, bing_site_verification: ?string, twitter_site_handle: ?string, facebook_app_id: ?string}
+     */
+    private function resolveSeoSharedProps(): array
+    {
+        $seo = app(SeoSettings::class);
+
+        return [
+            'google_analytics_id' => $seo->google_analytics_id,
+            'google_tag_manager_id' => $seo->google_tag_manager_id,
+            'google_site_verification' => $seo->google_site_verification,
+            'bing_site_verification' => $seo->bing_site_verification,
+            'twitter_site_handle' => $seo->twitter_site_handle,
+            'facebook_app_id' => $seo->facebook_app_id,
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Settings\SeoSettings;
 
 test('sitemap.xml returns a valid sitemap covering home, posts, pages, categories, tags', function (): void {
     $post = Post::factory()->published()->create();
@@ -37,4 +38,26 @@ test('sitemap.xml excludes draft posts and pages', function (): void {
 
     expect($body)->not->toContain(route('posts.show', ['post' => $draftPost]))
         ->and($body)->not->toContain(route('pages.show', ['page' => $draftPage]));
+});
+
+test('sitemap honors SeoSettings sitemap_include_categories toggle', function (): void {
+    $category = Category::factory()->create(['slug' => 'news-toggle']);
+
+    $s = app(SeoSettings::class);
+    $s->sitemap_include_categories = false;
+    $s->save();
+
+    $body = $this->get('/sitemap.xml')->getContent();
+    expect($body)->not->toContain(route('categories.show', ['category' => $category]));
+});
+
+test('sitemap honors SeoSettings sitemap_include_tags toggle', function (): void {
+    $tag = Tag::factory()->create(['slug' => 'laravel-toggle']);
+
+    $s = app(SeoSettings::class);
+    $s->sitemap_include_tags = false;
+    $s->save();
+
+    $body = $this->get('/sitemap.xml')->getContent();
+    expect($body)->not->toContain(route('tags.show', ['tag' => $tag]));
 });

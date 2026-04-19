@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\SeoSettings;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -48,6 +49,7 @@ class SystemSettings extends Page
             'general' => app(GeneralSettings::class)->toArray(),
             'backup' => app(BackupSettings::class)->toArray(),
             'comments' => app(CommentSettings::class)->toArray(),
+            'seo' => app(SeoSettings::class)->toArray(),
         ];
 
         $this->form->fill($this->data);
@@ -133,6 +135,19 @@ class SystemSettings extends Page
                                 Toggle::make('notify_author_on_reply')->label('作者收到回复时通知'),
                                 Toggle::make('honeypot_enabled')->label('启用蜜罐防爬'),
                             ]),
+                        Tab::make('SEO')
+                            ->statePath('seo')
+                            ->schema([
+                                TextInput::make('google_analytics_id')->nullable()->maxLength(64)->label('Google Analytics ID'),
+                                TextInput::make('google_tag_manager_id')->nullable()->maxLength(64)->label('Google Tag Manager ID'),
+                                TextInput::make('google_site_verification')->nullable()->maxLength(255)->label('Google Site Verification'),
+                                TextInput::make('bing_site_verification')->nullable()->maxLength(255)->label('Bing Site Verification'),
+                                TextInput::make('twitter_site_handle')->nullable()->maxLength(32)->label('Twitter Handle (@name)'),
+                                TextInput::make('facebook_app_id')->nullable()->maxLength(32)->label('Facebook App ID'),
+                                Textarea::make('robots_extra')->nullable()->rows(4)->label('robots.txt 追加内容')->helperText('追加到标准 robots.txt 后面的自定义行'),
+                                Toggle::make('sitemap_include_categories')->label('Sitemap 包含分类页'),
+                                Toggle::make('sitemap_include_tags')->label('Sitemap 包含标签页'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -161,6 +176,12 @@ class SystemSettings extends Page
             $comments->{$key} = $this->castSettingsValue($key, $value);
         }
         $comments->save();
+
+        $seo = app(SeoSettings::class);
+        foreach (($state['seo'] ?? []) as $key => $value) {
+            $seo->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $seo->save();
 
         Notification::make()
             ->title('Settings saved')
@@ -199,7 +220,8 @@ class SystemSettings extends Page
 
             // Boolean-typed properties across settings classes.
             'enabled', 'include_storage_files',
-            'allow_guests', 'notify_author_on_reply', 'honeypot_enabled' => (bool) $value,
+            'allow_guests', 'notify_author_on_reply', 'honeypot_enabled',
+            'sitemap_include_categories', 'sitemap_include_tags' => (bool) $value,
 
             default => $value,
         };

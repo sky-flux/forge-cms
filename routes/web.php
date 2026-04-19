@@ -8,6 +8,7 @@ use App\Http\Controllers\Web\PostController;
 use App\Http\Controllers\Web\SearchController;
 use App\Http\Controllers\Web\SitemapController;
 use App\Http\Controllers\Web\TagController;
+use App\Settings\SeoSettings;
 use Illuminate\Support\Facades\Route;
 use Spatie\Honeypot\ProtectAgainstSpam;
 
@@ -30,6 +31,23 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::feeds();
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+/*
+ * Dynamic robots.txt. In production the static `public/robots.txt` file is
+ * served by the web server (nginx/apache) before Laravel's routing layer is
+ * reached, so this route only takes effect if that static file is removed.
+ * Under `php artisan serve` / feature tests the request passes through the
+ * HTTP kernel and this handler is used, which is what drives RobotsTxtTest.
+ */
+Route::get('/robots.txt', function () {
+    $settings = app(SeoSettings::class);
+    $base = "User-agent: *\nAllow: /\nSitemap: ".url('/sitemap.xml');
+    if ($settings->robots_extra) {
+        $base .= "\n".$settings->robots_extra;
+    }
+
+    return response($base, 200, ['Content-Type' => 'text/plain']);
+})->name('robots');
 
 Route::post('/posts/{post:uuid}/comments', [CommentController::class, 'storeForPost'])
     ->middleware(['throttle:3,1', ProtectAgainstSpam::class])

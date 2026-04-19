@@ -3,6 +3,7 @@
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\SeoSettings;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
@@ -20,6 +21,7 @@ return [
         GeneralSettings::class,
         BackupSettings::class,
         CommentSettings::class,
+        SeoSettings::class,
     ],
 
     /*

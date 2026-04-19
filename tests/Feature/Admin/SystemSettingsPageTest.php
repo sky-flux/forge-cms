@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\SeoSettings;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
@@ -134,6 +135,30 @@ test('system settings page saves backup tab values', function (): void {
         ->and($reloaded->keep_daily_days)->toBe(14)
         ->and($reloaded->notify_email)->toBe('ops@example.com')
         ->and($reloaded->schedule_hour)->toBe(3);
+});
+
+test('system settings page saves seo tab', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(SystemSettings::class)
+        ->fillForm([
+            'seo' => [
+                'google_analytics_id' => 'G-XYZ',
+                'twitter_site_handle' => '@forge',
+                'sitemap_include_categories' => false,
+                'sitemap_include_tags' => false,
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    app()->forgetInstance(SeoSettings::class);
+    $reloaded = app(SeoSettings::class);
+    expect($reloaded->google_analytics_id)->toBe('G-XYZ')
+        ->and($reloaded->twitter_site_handle)->toBe('@forge')
+        ->and($reloaded->sitemap_include_categories)->toBeFalse();
 });
 
 test('system settings page saves comment policy tab', function (): void {
