@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Support\Dictionary;
 use Database\Factories\DictionaryItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,5 +29,26 @@ class DictionaryItem extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(DictionaryType::class, 'type_id');
+    }
+
+    protected static function booted(): void
+    {
+        $bust = function (DictionaryItem $item): void {
+            $code = $item->type()->value('code');
+            if ($code !== null) {
+                Dictionary::forget($code);
+            }
+
+            $originalTypeId = $item->getOriginal('type_id');
+            if ($originalTypeId !== null && (int) $originalTypeId !== (int) $item->type_id) {
+                $originalCode = DictionaryType::query()->where('id', $originalTypeId)->value('code');
+                if ($originalCode !== null) {
+                    Dictionary::forget($originalCode);
+                }
+            }
+        };
+
+        static::saved($bust);
+        static::deleted($bust);
     }
 }

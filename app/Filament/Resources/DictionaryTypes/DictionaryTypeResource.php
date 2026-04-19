@@ -33,12 +33,6 @@ class DictionaryTypeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    // TEMPORARY: replaced by DictionaryTypePolicy in Task 5 of plan 2026-04-19-system-dictionary.md
-    public static function canAccess(): bool
-    {
-        return true;
-    }
-
     public static function form(Schema $schema): Schema
     {
         return DictionaryTypeForm::configure($schema);
