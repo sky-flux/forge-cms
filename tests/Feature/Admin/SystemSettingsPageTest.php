@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 use App\Filament\Pages\SystemSettings;
 use App\Models\User;
+use App\Settings\AppearanceSettings;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\LegalSettings;
+use App\Settings\MailSettings;
 use App\Settings\MediaUploadSettings;
+use App\Settings\PerformanceSettings;
+use App\Settings\SecuritySettings;
 use App\Settings\SeoSettings;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Testing\AssertableInertia;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
@@ -220,4 +226,52 @@ test('system settings page saves media upload + feed tabs', function (): void {
         ->and(app(FeedSettings::class)->items_per_feed)->toBe(100)
         ->and(app(FeedSettings::class)->sitemap_default_priority)->toBe(0.8)
         ->and(app(FeedSettings::class)->sitemap_change_frequency)->toBe('daily');
+});
+
+test('system settings page saves mail/appearance/performance/legal/security tabs', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(SystemSettings::class)
+        ->fillForm([
+            'mail' => ['from_name' => 'Forge', 'from_address' => 'noreply@ex.com', 'reply_to' => null, 'footer_template' => 'Sent by Forge'],
+            'appearance' => ['logo_url' => 'https://ex.com/logo.png', 'favicon_url' => null, 'primary_color' => '#ff0000', 'footer_text' => '© Forge'],
+            'performance' => ['post_cache_ttl_minutes' => 120, 'sitemap_cache_ttl_hours' => 48, 'scout_batch_size' => 1000],
+            'legal' => ['terms_url' => 'https://ex.com/terms', 'privacy_url' => null, 'cookie_banner_enabled' => true, 'cookie_banner_text' => 'We use cookies', 'gdpr_comment_opt_in' => true],
+            'security' => ['require_2fa_for_super_admin' => true, 'session_lifetime_minutes' => 60, 'password_min_length' => 16, 'max_login_attempts' => 3, 'lockout_minutes' => 30],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    foreach ([MailSettings::class, AppearanceSettings::class, PerformanceSettings::class, LegalSettings::class, SecuritySettings::class] as $cls) {
+        app()->forgetInstance($cls);
+    }
+
+    expect(app(MailSettings::class)->from_name)->toBe('Forge')
+        ->and(app(AppearanceSettings::class)->primary_color)->toBe('#ff0000')
+        ->and(app(PerformanceSettings::class)->post_cache_ttl_minutes)->toBe(120)
+        ->and(app(LegalSettings::class)->cookie_banner_enabled)->toBeTrue()
+        ->and(app(SecuritySettings::class)->require_2fa_for_super_admin)->toBeTrue();
+});
+
+test('public pages expose appearance + legal shared props', function (): void {
+    $a = app(AppearanceSettings::class);
+    $a->logo_url = 'https://ex.com/logo.png';
+    $a->save();
+
+    $l = app(LegalSettings::class);
+    $l->cookie_banner_enabled = true;
+    $l->cookie_banner_text = 'We use cookies';
+    $l->save();
+
+    $this->withoutVite();
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('appearance.logo_url', 'https://ex.com/logo.png')
+            ->where('legal.cookie_banner_enabled', true)
+            ->where('legal.cookie_banner_text', 'We use cookies')
+        );
 });

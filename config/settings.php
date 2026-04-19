@@ -1,10 +1,15 @@
 <?php
 
+use App\Settings\AppearanceSettings;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\LegalSettings;
+use App\Settings\MailSettings;
 use App\Settings\MediaUploadSettings;
+use App\Settings\PerformanceSettings;
+use App\Settings\SecuritySettings;
 use App\Settings\SeoSettings;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
@@ -20,12 +25,17 @@ return [
      * put them (manually) here.
      */
     'settings' => [
-        GeneralSettings::class,
+        AppearanceSettings::class,
         BackupSettings::class,
         CommentSettings::class,
-        SeoSettings::class,
-        MediaUploadSettings::class,
         FeedSettings::class,
+        GeneralSettings::class,
+        LegalSettings::class,
+        MailSettings::class,
+        MediaUploadSettings::class,
+        PerformanceSettings::class,
+        SecuritySettings::class,
+        SeoSettings::class,
     ],
 
     /*

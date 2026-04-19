@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Settings\AppearanceSettings;
+use App\Settings\LegalSettings;
 use App\Settings\SeoSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -47,6 +49,50 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'seo' => fn () => $this->resolveSeoSharedProps(),
+            'appearance' => fn () => $this->resolveAppearanceSharedProps(),
+            'legal' => fn () => $this->resolveLegalSharedProps(),
+        ];
+    }
+
+    /**
+     * Resolve the appearance / branding shared props exposed to every Inertia
+     * response.
+     *
+     * Resolved per-request so Octane-shared containers and runtime settings
+     * edits take effect on the next visit.
+     *
+     * @return array{logo_url: ?string, favicon_url: ?string, primary_color: string, footer_text: ?string}
+     */
+    private function resolveAppearanceSharedProps(): array
+    {
+        $appearance = app(AppearanceSettings::class);
+
+        return [
+            'logo_url' => $appearance->logo_url,
+            'favicon_url' => $appearance->favicon_url,
+            'primary_color' => $appearance->primary_color,
+            'footer_text' => $appearance->footer_text,
+        ];
+    }
+
+    /**
+     * Resolve the legal / compliance shared props exposed to every Inertia
+     * response.
+     *
+     * Resolved per-request so Octane-shared containers and runtime settings
+     * edits take effect on the next visit.
+     *
+     * @return array{terms_url: ?string, privacy_url: ?string, cookie_banner_enabled: bool, cookie_banner_text: ?string}
+     */
+    private function resolveLegalSharedProps(): array
+    {
+        $legal = app(LegalSettings::class);
+
+        return [
+            'terms_url' => $legal->terms_url,
+            'privacy_url' => $legal->privacy_url,
+            'cookie_banner_enabled' => $legal->cookie_banner_enabled,
+            'cookie_banner_text' => $legal->cookie_banner_text,
         ];
     }
 

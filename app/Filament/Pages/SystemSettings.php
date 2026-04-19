@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Settings\AppearanceSettings;
 use App\Settings\BackupSettings;
 use App\Settings\CommentSettings;
 use App\Settings\FeedSettings;
 use App\Settings\GeneralSettings;
+use App\Settings\LegalSettings;
+use App\Settings\MailSettings;
 use App\Settings\MediaUploadSettings;
+use App\Settings\PerformanceSettings;
+use App\Settings\SecuritySettings;
 use App\Settings\SeoSettings;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -54,6 +59,11 @@ class SystemSettings extends Page
             'seo' => app(SeoSettings::class)->toArray(),
             'media_upload' => app(MediaUploadSettings::class)->toArray(),
             'feed' => app(FeedSettings::class)->toArray(),
+            'mail' => app(MailSettings::class)->toArray(),
+            'appearance' => app(AppearanceSettings::class)->toArray(),
+            'performance' => app(PerformanceSettings::class)->toArray(),
+            'legal' => app(LegalSettings::class)->toArray(),
+            'security' => app(SecuritySettings::class)->toArray(),
         ];
 
         $this->form->fill($this->data);
@@ -180,6 +190,47 @@ class SystemSettings extends Page
                                     ->required()
                                     ->label('Sitemap 更新频率'),
                             ]),
+                        Tab::make('邮件')
+                            ->statePath('mail')
+                            ->schema([
+                                TextInput::make('from_name')->nullable()->maxLength(128)->label('发件人名称'),
+                                TextInput::make('from_address')->email()->nullable()->label('发件人邮箱'),
+                                TextInput::make('reply_to')->email()->nullable()->label('回复邮箱'),
+                                Textarea::make('footer_template')->nullable()->rows(4)->label('邮件 Footer 模板(Markdown)'),
+                            ]),
+                        Tab::make('外观')
+                            ->statePath('appearance')
+                            ->schema([
+                                TextInput::make('logo_url')->url()->nullable()->maxLength(2048)->label('Logo URL'),
+                                TextInput::make('favicon_url')->url()->nullable()->maxLength(2048)->label('Favicon URL'),
+                                TextInput::make('primary_color')->required()->maxLength(16)->label('主色 (#hex)'),
+                                TextInput::make('footer_text')->nullable()->maxLength(255)->label('页脚文本'),
+                            ]),
+                        Tab::make('性能')
+                            ->statePath('performance')
+                            ->schema([
+                                TextInput::make('post_cache_ttl_minutes')->numeric()->minValue(0)->maxValue(1440)->label('文章缓存(分钟)'),
+                                TextInput::make('sitemap_cache_ttl_hours')->numeric()->minValue(0)->maxValue(168)->label('Sitemap 缓存(小时)'),
+                                TextInput::make('scout_batch_size')->numeric()->minValue(50)->maxValue(5000)->label('Scout 批量大小'),
+                            ]),
+                        Tab::make('法律')
+                            ->statePath('legal')
+                            ->schema([
+                                TextInput::make('terms_url')->url()->nullable()->label('服务条款 URL'),
+                                TextInput::make('privacy_url')->url()->nullable()->label('隐私政策 URL'),
+                                Toggle::make('cookie_banner_enabled')->label('启用 Cookie 横幅'),
+                                Textarea::make('cookie_banner_text')->nullable()->rows(3)->label('Cookie 横幅文本'),
+                                Toggle::make('gdpr_comment_opt_in')->label('评论需 GDPR 同意'),
+                            ]),
+                        Tab::make('安全策略')
+                            ->statePath('security')
+                            ->schema([
+                                Toggle::make('require_2fa_for_super_admin')->label('super_admin 强制 2FA'),
+                                TextInput::make('session_lifetime_minutes')->numeric()->minValue(5)->maxValue(10080)->label('Session 寿命(分钟)'),
+                                TextInput::make('password_min_length')->numeric()->minValue(6)->maxValue(64)->label('密码最小长度'),
+                                TextInput::make('max_login_attempts')->numeric()->minValue(1)->maxValue(20)->label('最大登录尝试'),
+                                TextInput::make('lockout_minutes')->numeric()->minValue(1)->maxValue(1440)->label('锁定时长(分钟)'),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -227,6 +278,36 @@ class SystemSettings extends Page
         }
         $feed->save();
 
+        $mail = app(MailSettings::class);
+        foreach (($state['mail'] ?? []) as $key => $value) {
+            $mail->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $mail->save();
+
+        $appearance = app(AppearanceSettings::class);
+        foreach (($state['appearance'] ?? []) as $key => $value) {
+            $appearance->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $appearance->save();
+
+        $performance = app(PerformanceSettings::class);
+        foreach (($state['performance'] ?? []) as $key => $value) {
+            $performance->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $performance->save();
+
+        $legal = app(LegalSettings::class);
+        foreach (($state['legal'] ?? []) as $key => $value) {
+            $legal->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $legal->save();
+
+        $security = app(SecuritySettings::class);
+        foreach (($state['security'] ?? []) as $key => $value) {
+            $security->{$key} = $this->castSettingsValue($key, $value);
+        }
+        $security->save();
+
         Notification::make()
             ->title('Settings saved')
             ->success()
@@ -262,13 +343,18 @@ class SystemSettings extends Page
             'keep_daily_days', 'keep_weekly_weeks', 'keep_monthly_months',
             'schedule_hour', 'max_depth', 'throttle_per_minute',
             'max_upload_size_mb', 'image_quality',
-            'items_per_feed', 'feed_cache_ttl_minutes' => (int) $value,
+            'items_per_feed', 'feed_cache_ttl_minutes',
+            'post_cache_ttl_minutes', 'sitemap_cache_ttl_hours', 'scout_batch_size',
+            'session_lifetime_minutes', 'password_min_length',
+            'max_login_attempts', 'lockout_minutes' => (int) $value,
 
             // Boolean-typed properties across settings classes.
             'enabled', 'include_storage_files',
             'allow_guests', 'notify_author_on_reply', 'honeypot_enabled',
             'sitemap_include_categories', 'sitemap_include_tags',
-            'auto_convert_to_webp', 'include_excerpts_in_feed' => (bool) $value,
+            'auto_convert_to_webp', 'include_excerpts_in_feed',
+            'cookie_banner_enabled', 'gdpr_comment_opt_in',
+            'require_2fa_for_super_admin' => (bool) $value,
 
             // Float-typed properties.
             'sitemap_default_priority' => (float) $value,
