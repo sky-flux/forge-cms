@@ -181,10 +181,15 @@ Check sibling files, related controllers, models, or tests for established patte
 - No JS/CSS in Blade, no HTML in PHP classes
 - Code should be readable; comments only for config files
 
+### 20. ForgeCMS-Specific Overrides → `rules/forge-cms-overrides.md` (HIGHEST PRIORITY — READ FIRST)
+
+Project-specific rules that **override or narrow** the generic sections above. Covers: Octane-safe runtime, `casts()` method mandate, `$fillable`-vs-`#[Fillable]` per-model convention, `HasUuids` + UUID route binding on content models, `preventLazyLoading` enforcement, `Web/` + `Settings/` controller layout (no `Api/`), explicit `AuthorizesRequests` trait usage, `PostResource`-before-Inertia rule, Pest `assertInertia`/`$this->get()` test style, pint `--dirty --format agent` (never `--test`). Also tabulates what `docs/laravel.md` prescribes but isn't enforced yet.
+
 ## How to Apply
 
 Always use a sub-agent to read rule files and explore this skill's content.
 
-1. Identify the file type and select relevant sections (e.g., migration → §16, controller → §1, §3, §5, §6, §10)
-2. Check sibling files for existing patterns — follow those first per Consistency First
-3. Verify API syntax with `search-docs` for the installed Laravel version
+1. **Read §20 first** — project-specific overrides win over every generic rule below
+2. Identify the file type and select relevant sections (e.g., migration → §16, controller → §1, §3, §5, §6, §10)
+3. Check sibling files for existing patterns — follow those first per Consistency First
+4. Verify API syntax with `search-docs` for the installed Laravel version
