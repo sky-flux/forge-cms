@@ -5,6 +5,10 @@ declare(strict_types=1);
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
+beforeEach(function (): void {
+    $this->withoutVite();
+});
+
 test('auth.user only exposes whitelisted fields and omits 2FA secrets', function () {
     $user = User::factory()->create();
 

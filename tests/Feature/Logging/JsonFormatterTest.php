@@ -13,7 +13,7 @@ test('the stderr channel is configured with JsonFormatter via env', function ():
 
     $contents = file_get_contents($envPath);
 
-    expect($contents)->toContain('LOG_STDERR_FORMATTER=Monolog\\\\Formatter\\\\JsonFormatter');
+    expect($contents)->toContain('LOG_STDERR_FORMATTER=Monolog\\Formatter\\JsonFormatter');
 });
 
 test('the .env.example ships JsonFormatter for stderr', function (): void {
@@ -22,7 +22,7 @@ test('the .env.example ships JsonFormatter for stderr', function (): void {
 
     $contents = file_get_contents($examplePath);
 
-    expect($contents)->toContain('LOG_STDERR_FORMATTER=Monolog\\\\Formatter\\\\JsonFormatter');
+    expect($contents)->toContain('LOG_STDERR_FORMATTER=Monolog\\Formatter\\JsonFormatter');
 });
 
 test('a Monolog logger configured like the stderr channel emits one JSON record per line', function (): void {
