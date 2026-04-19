@@ -60,7 +60,8 @@ class AdminPanelProvider extends PanelProvider
                 '系统',
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->navigationGroup('系统'),
             ])
             ->authMiddleware([
                 Authenticate::class,

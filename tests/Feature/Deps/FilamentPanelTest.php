@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Spatie\Permission\Models\Role;
 
 test('redirects guests from /admin to the filament login page', function (): void {
@@ -39,4 +40,11 @@ test('admin panel declares 内容 and 系统 navigation groups in that order', f
         ->and($groupKeys)->toContain('系统')
         ->and(array_search('内容', $groupKeys, true))
         ->toBeLessThan(array_search('系统', $groupKeys, true));
+});
+
+test('roles resource appears under the 系统 navigation group', function (): void {
+    $resource = RoleResource::class;
+
+    expect(class_exists($resource))->toBeTrue()
+        ->and($resource::getNavigationGroup())->toBe('系统');
 });
