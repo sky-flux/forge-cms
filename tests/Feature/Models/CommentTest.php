@@ -84,6 +84,28 @@ test('authorName returns user name for auth comment, guest_name for guest', func
     expect($guestComment->authorName())->toBe('Bob');
 });
 
+test('CommentObserver regenerates body_html on create', function (): void {
+    $comment = Comment::factory()->create(['body' => "Line one\nLine two"]);
+
+    expect($comment->body_html)->toBe(nl2br(e("Line one\nLine two")));
+});
+
+test('CommentObserver regenerates body_html when body changes on update', function (): void {
+    $comment = Comment::factory()->create(['body' => 'Original', 'body_html' => 'Original']);
+
+    $comment->update(['body' => "Edited<script>alert(1)</script>\nnewline"]);
+
+    expect($comment->fresh()->body_html)->toBe(nl2br(e("Edited<script>alert(1)</script>\nnewline")));
+});
+
+test('CommentObserver does not touch body_html when body is unchanged', function (): void {
+    $comment = Comment::factory()->create(['body' => 'Same', 'body_html' => 'Same']);
+
+    $comment->update(['status' => CommentStatus::Approved, 'approved_at' => now()]);
+
+    expect($comment->fresh()->body_html)->toBe('Same');
+});
+
 test('pending and approved scopes filter correctly', function (): void {
     Comment::factory()->count(2)->create();
     Comment::factory()->approved()->count(3)->create();

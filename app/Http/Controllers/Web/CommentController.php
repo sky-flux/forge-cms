@@ -48,7 +48,6 @@ class CommentController extends Controller
             'guest_ip_hash' => $hasher->hash($request->ip() ?? '0.0.0.0'),
             'user_agent' => Str::limit((string) $request->userAgent(), 500, ''),
             'body' => $body,
-            'body_html' => nl2br(e($body)),
             'status' => $requireModeration ? CommentStatus::Pending : CommentStatus::Approved,
             'approved_at' => $requireModeration ? null : now(),
         ]);
