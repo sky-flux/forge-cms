@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function (): void {
@@ -28,4 +31,47 @@ test('super_admin can access the users index page', function (): void {
 
 test('guests are redirected from /admin/users to login', function (): void {
     $this->get('/admin/users')->assertRedirect('/admin/login');
+});
+
+test('super_admin creates a user with name, email, password, and roles', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    Livewire::actingAs($admin)
+        ->test(CreateUser::class)
+        ->fillForm([
+            'name' => 'New Editor',
+            'email' => 'editor@example.com',
+            'password' => 'secret-password-123',
+            'password_confirmation' => 'secret-password-123',
+            'roles' => [Role::findByName('admin')->id],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $created = User::where('email', 'editor@example.com')->firstOrFail();
+    expect($created->name)->toBe('New Editor')
+        ->and($created->hasRole('admin'))->toBeTrue()
+        ->and(Hash::check('secret-password-123', $created->password))->toBeTrue();
+});
+
+test('editing a user persists role changes without changing password unless provided', function (): void {
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $target = User::factory()->create(['password' => bcrypt('keep-this-pw')]);
+
+    Livewire::actingAs($admin)
+        ->test(EditUser::class, ['record' => $target->getRouteKey()])
+        ->fillForm([
+            'name' => $target->name,
+            'email' => $target->email,
+            'roles' => [Role::findByName('admin')->id],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $target->refresh();
+    expect($target->hasRole('admin'))->toBeTrue()
+        ->and(Hash::check('keep-this-pw', $target->password))->toBeTrue();
 });
