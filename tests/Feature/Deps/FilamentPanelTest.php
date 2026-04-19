@@ -9,6 +9,7 @@ use App\Filament\Resources\Posts\PostResource;
 use App\Filament\Resources\Tags\TagResource;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
+use Filament\Support\Icons\Heroicon;
 use Spatie\Permission\Models\Role;
 
 test('redirects guests from /console to the filament login page', function (): void {
@@ -52,6 +53,13 @@ test('roles resource appears under the 系统 navigation group', function (): vo
 
     expect(class_exists($resource))->toBeTrue()
         ->and($resource::getNavigationGroup())->toBe('系统');
+});
+
+test('roles resource uses Identification icon with matching active variant', function (): void {
+    $resource = RoleResource::class;
+
+    expect($resource::getNavigationIcon())->toBe(Heroicon::OutlinedIdentification)
+        ->and($resource::getActiveNavigationIcon())->toBe(Heroicon::OutlinedIdentification);
 });
 
 test('content resources are grouped under 内容 with stable sort order', function (): void {

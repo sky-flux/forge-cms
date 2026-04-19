@@ -13,6 +13,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -61,7 +62,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make()
-                    ->navigationGroup('系统'),
+                    ->navigationGroup('系统')
+                    ->navigationIcon(Heroicon::OutlinedIdentification)
+                    ->activeNavigationIcon(Heroicon::OutlinedIdentification),
             ])
             ->authMiddleware([
                 Authenticate::class,
