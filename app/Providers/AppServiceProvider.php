@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\FailedLoginAttempt;
 use App\Models\ScheduledTaskRun;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\MediaPolicy;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Database\Eloquent\Model;
@@ -61,6 +63,25 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureDefaults();
         $this->registerScheduleListeners();
+        $this->registerFailedLoginListener();
+    }
+
+    /**
+     * Persist a row for every failed login attempt so the admin
+     * `系统 → 安全` page can display recent brute-force activity.
+     */
+    protected function registerFailedLoginListener(): void
+    {
+        Event::listen(function (Failed $event): void {
+            $credentials = $event->credentials ?? [];
+
+            FailedLoginAttempt::create([
+                'email' => (string) ($credentials['email'] ?? 'unknown'),
+                'ip' => request()?->ip(),
+                'user_agent' => request()?->userAgent(),
+                'attempted_at' => now(),
+            ]);
+        });
     }
 
     /**
