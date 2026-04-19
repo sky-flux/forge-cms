@@ -2,16 +2,14 @@
 
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CommentController;
+use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\PostController;
 use App\Http\Controllers\Web\TagController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 use Spatie\Honeypot\ProtectAgainstSpam;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
