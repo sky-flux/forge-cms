@@ -30,6 +30,8 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = '用户';
 
+    protected static ?string $slug = 'system/users';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

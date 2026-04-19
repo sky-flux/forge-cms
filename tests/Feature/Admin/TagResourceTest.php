@@ -17,12 +17,12 @@ test('super_admin accesses the tags resource index page', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/tags')
+        ->get('/console/tags')
         ->assertSuccessful();
 });
 
 test('guests are redirected from the tags resource to login', function (): void {
-    $this->get('/admin/tags')->assertRedirect('/admin/login');
+    $this->get('/console/tags')->assertRedirect('/console/login');
 });
 
 test('super_admin can render the create tag form', function (): void {
@@ -30,7 +30,7 @@ test('super_admin can render the create tag form', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/tags/create')
+        ->get('/console/tags/create')
         ->assertSuccessful();
 });
 

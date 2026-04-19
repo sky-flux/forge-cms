@@ -17,12 +17,12 @@ test('super_admin accesses the categories resource index page', function (): voi
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/categories')
+        ->get('/console/categories')
         ->assertSuccessful();
 });
 
 test('guests are redirected from the categories resource to login', function (): void {
-    $this->get('/admin/categories')->assertRedirect('/admin/login');
+    $this->get('/console/categories')->assertRedirect('/console/login');
 });
 
 test('super_admin can render the create category form', function (): void {
@@ -30,7 +30,7 @@ test('super_admin can render the create category form', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/categories/create')
+        ->get('/console/categories/create')
         ->assertSuccessful();
 });
 

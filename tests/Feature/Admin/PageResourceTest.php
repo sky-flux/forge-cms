@@ -19,12 +19,12 @@ test('super_admin accesses the pages resource index page', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/pages')
+        ->get('/console/pages')
         ->assertSuccessful();
 });
 
 test('guests are redirected from the pages resource to login', function (): void {
-    $this->get('/admin/pages')->assertRedirect('/admin/login');
+    $this->get('/console/pages')->assertRedirect('/console/login');
 });
 
 test('super_admin can render the create form page', function (): void {
@@ -32,7 +32,7 @@ test('super_admin can render the create form page', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/pages/create')
+        ->get('/console/pages/create')
         ->assertSuccessful();
 });
 

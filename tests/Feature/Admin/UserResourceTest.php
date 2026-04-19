@@ -26,12 +26,12 @@ test('super_admin can access the users index page', function (): void {
     $admin->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/users')
+        ->get('/console/system/users')
         ->assertSuccessful();
 });
 
-test('guests are redirected from /admin/users to login', function (): void {
-    $this->get('/admin/users')->assertRedirect('/admin/login');
+test('guests are redirected from /console/system/users to login', function (): void {
+    $this->get('/console/system/users')->assertRedirect('/console/login');
 });
 
 test('super_admin creates a user with name, email, password, and roles', function (): void {

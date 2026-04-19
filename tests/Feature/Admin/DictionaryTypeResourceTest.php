@@ -52,8 +52,8 @@ test('super_admin can create a dictionary type', function (): void {
     expect(DictionaryType::where('code', 'post_visibility')->exists())->toBeTrue();
 });
 
-test('guests are redirected from /admin/dictionary-types to login', function (): void {
-    $this->get('/admin/dictionary-types')->assertRedirect('/admin/login');
+test('guests are redirected from /console/system/dictionaries to login', function (): void {
+    $this->get('/console/system/dictionaries')->assertRedirect('/console/login');
 });
 
 test('dictionary type code must be unique', function (): void {

@@ -11,10 +11,10 @@ use App\Models\User;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Spatie\Permission\Models\Role;
 
-test('redirects guests from /admin to the filament login page', function (): void {
-    $response = $this->get('/admin');
+test('redirects guests from /console to the filament login page', function (): void {
+    $response = $this->get('/console');
 
-    $response->assertRedirect('/admin/login');
+    $response->assertRedirect('/console/login');
 });
 
 test('renders the filament dashboard for a super_admin user', function (): void {
@@ -22,7 +22,7 @@ test('renders the filament dashboard for a super_admin user', function (): void 
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $this->actingAs($user)->get('/admin')->assertSuccessful();
+    $this->actingAs($user)->get('/console')->assertSuccessful();
 });
 
 test('denies panel access to a regular user in production', function (): void {
@@ -30,7 +30,7 @@ test('denies panel access to a regular user in production', function (): void {
 
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get('/admin')->assertForbidden();
+    $this->actingAs($user)->get('/console')->assertForbidden();
 });
 
 test('admin panel declares 内容 and 系统 navigation groups in that order', function (): void {

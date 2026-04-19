@@ -55,7 +55,7 @@ test('super_admin can render the system settings page', function (): void {
 });
 
 test('guests are redirected from the system settings page to login', function (): void {
-    $this->get(SystemSettings::getUrl())->assertRedirect('/admin/login');
+    $this->get(SystemSettings::getUrl())->assertRedirect('/console/login');
 });
 
 test('saving the form persists GeneralSettings values', function (): void {

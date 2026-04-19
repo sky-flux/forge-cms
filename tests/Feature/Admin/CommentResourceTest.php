@@ -18,12 +18,12 @@ test('super_admin accesses the comments resource index page', function (): void 
     $admin = User::factory()->create()->assignRole('super_admin');
 
     $this->actingAs($admin)
-        ->get('/admin/comments')
+        ->get('/console/comments')
         ->assertSuccessful();
 });
 
 test('guests are redirected from the comments resource to login', function (): void {
-    $this->get('/admin/comments')->assertRedirect('/admin/login');
+    $this->get('/console/comments')->assertRedirect('/console/login');
 });
 
 test('CommentResource binds to the Comment model', function (): void {
