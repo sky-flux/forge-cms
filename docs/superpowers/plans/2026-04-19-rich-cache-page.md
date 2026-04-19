@@ -29,7 +29,7 @@ declare(strict_types=1);
 
 use App\Filament\Pages\Cache as CachePage;
 use App\Models\User;
-use Filament\Actions\Testing\Fixtures\TestAction;
+use Filament\Actions\Action;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Spatie\Activitylog\Models\Activity;
@@ -123,7 +123,7 @@ test('flushApp header action requires confirmation', function (): void {
 
     Livewire::actingAs($admin)
         ->test(CachePage::class)
-        ->assertActionExists('flushApp', fn (TestAction $action): TestAction => $action->requiresConfirmation());
+        ->assertActionExists('flushApp', fn (Action $action): bool => $action->isConfirmationRequired());
 });
 
 test('resetOpcache header action requires confirmation', function (): void {
@@ -136,7 +136,7 @@ test('resetOpcache header action requires confirmation', function (): void {
 
     Livewire::actingAs($admin)
         ->test(CachePage::class)
-        ->assertActionExists('resetOpcache', fn (TestAction $action): TestAction => $action->requiresConfirmation());
+        ->assertActionExists('resetOpcache', fn (Action $action): bool => $action->isConfirmationRequired());
 });
 ```
 
