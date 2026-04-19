@@ -68,7 +68,11 @@ export default function PostsShow({ post, canonical, ogImage }: Props) {
 
                     {post.isCommentsEnabled ? (
                         <>
-                            <CommentThread comments={post.comments} />
+                            <CommentThread
+                                comments={post.comments}
+                                action={postCommentsStore(post.uuid).url}
+                                authenticated={authenticated}
+                            />
 
                             <div className="mt-12 border-t pt-6">
                                 <h3 className="mb-4 text-lg font-semibold">Leave a comment</h3>

@@ -55,7 +55,11 @@ export default function PagesShow({ page, canonical, ogImage }: Props) {
 
                     {page.isCommentsEnabled ? (
                         <>
-                            <CommentThread comments={page.comments} />
+                            <CommentThread
+                                comments={page.comments}
+                                action={pageCommentsStore(page.slug).url}
+                                authenticated={authenticated}
+                            />
 
                             <div className="mt-12 border-t pt-6">
                                 <h3 className="mb-4 text-lg font-semibold">Leave a comment</h3>

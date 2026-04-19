@@ -3,19 +3,25 @@ import { useForm } from '@inertiajs/react';
 interface Props {
     action: string;
     authenticated: boolean;
+    parentId?: number | null;
+    onSubmitted?: () => void;
 }
 
-export function CommentForm({ action, authenticated }: Props) {
+export function CommentForm({ action, authenticated, parentId = null, onSubmitted }: Props) {
     const { data, setData, post, processing, errors, reset, wasSuccessful } = useForm({
         body: '',
         guest_name: '',
         guest_email: '',
+        parent_id: parentId,
     });
 
     const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
         post(action, {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                onSubmitted?.();
+            },
             preserveScroll: true,
         });
     };
@@ -77,6 +83,8 @@ export function CommentForm({ action, authenticated }: Props) {
                 />
                 {errors.body && <p className="mt-1 text-sm text-destructive">{errors.body}</p>}
             </div>
+
+            {errors.parent_id && <p className="mt-1 text-sm text-destructive">{errors.parent_id}</p>}
 
             <button
                 type="submit"

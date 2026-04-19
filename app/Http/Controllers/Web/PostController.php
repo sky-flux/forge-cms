@@ -40,6 +40,7 @@ class PostController extends Controller
             'user:id,name',
             'approvedComments' => fn ($q) => $q->with('user:id,name')->whereNull('parent_id')->orderBy('created_at', 'asc'),
             'approvedComments.approvedChildren' => fn ($q) => $q->with('user:id,name')->orderBy('created_at', 'asc'),
+            'approvedComments.approvedChildren.approvedChildren' => fn ($q) => $q->with('user:id,name')->orderBy('created_at', 'asc'),
         ]);
         $post->increment('view_count');
 
