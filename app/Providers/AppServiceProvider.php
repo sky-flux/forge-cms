@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\ScheduledTaskRun;
+use App\Policies\ActivityLogPolicy;
 use App\Policies\MediaPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Events\ScheduledTaskFinished;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AppServiceProvider extends ServiceProvider
@@ -48,6 +50,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(
             Media::class,
             MediaPolicy::class,
+        );
+
+        // Spatie Activity lives outside App\Models so Laravel's auto-discovery
+        // can't map it to ActivityLogPolicy — register the mapping explicitly.
+        Gate::policy(
+            Activity::class,
+            ActivityLogPolicy::class,
         );
 
         $this->configureDefaults();
