@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\CommentStatus;
+use App\Enums\PostStatus;
 use App\Models\Comment;
 use App\Models\Page;
 use App\Models\Post;
@@ -122,6 +123,30 @@ test('honeypot filled submissions are silently discarded', function (): void {
     ])->assertOk();
 
     // Honeypot middleware short-circuits before controller — no Comment created
+    expect(Comment::count())->toBe(0);
+});
+
+test('guest cannot comment on a draft post', function (): void {
+    $post = Post::factory()->create(['status' => PostStatus::Draft]);
+
+    $this->post("/posts/{$post->uuid}/comments", [
+        'body' => 'Sneaky comment on a draft',
+        'guest_name' => 'Alice',
+        'guest_email' => 'alice@example.com',
+    ])->assertForbidden();
+
+    expect(Comment::count())->toBe(0);
+});
+
+test('guest cannot comment on a draft page', function (): void {
+    $page = Page::factory()->create(['status' => PostStatus::Draft]);
+
+    $this->post("/pages/{$page->slug}/comments", [
+        'body' => 'Sneaky comment on a draft page',
+        'guest_name' => 'Alice',
+        'guest_email' => 'alice@example.com',
+    ])->assertForbidden();
+
     expect(Comment::count())->toBe(0);
 });
 

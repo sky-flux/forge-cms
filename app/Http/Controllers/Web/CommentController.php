@@ -13,6 +13,7 @@ use App\Models\Post;
 use App\Support\CommentIpHasher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class CommentController extends Controller
@@ -29,6 +30,8 @@ class CommentController extends Controller
 
     private function persist(StoreCommentRequest $request, Model $commentable, CommentIpHasher $hasher): RedirectResponse
     {
+        Gate::authorize('view', $commentable);
+
         abort_unless($commentable->is_comments_enabled, 403, 'Comments are disabled on this content.');
 
         $user = $request->user();
