@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -24,7 +26,7 @@ use Spatie\Sluggable\SlugOptions;
 class Post extends Model implements HasMedia
 {
     /** @use HasFactory<PostFactory> */
-    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, Searchable, SoftDeletes;
+    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, LogsActivity, Searchable, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'title', 'slug', 'excerpt', 'body_html',
@@ -128,5 +130,14 @@ class Post extends Model implements HasMedia
     {
         $this->addMediaCollection('featured')->singleFile();
         $this->addMediaCollection('gallery');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['title', 'slug', 'status', 'published_at', 'is_comments_enabled'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->setDescriptionForEvent(fn (string $eventName): string => "post.{$eventName}");
     }
 }

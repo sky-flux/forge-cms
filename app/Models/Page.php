@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -22,7 +24,7 @@ use Spatie\Sluggable\SlugOptions;
 class Page extends Model implements HasMedia
 {
     /** @use HasFactory<PageFactory> */
-    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, SoftDeletes;
+    use HasFactory, HasSlug, HasUuids, InteractsWithMedia, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'title', 'slug', 'excerpt', 'body_html',
@@ -90,5 +92,22 @@ class Page extends Model implements HasMedia
     public function scopeHomepage(Builder $query): void
     {
         $query->where('is_homepage', true);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'title',
+                'slug',
+                'status',
+                'published_at',
+                'is_homepage',
+                'is_comments_enabled',
+                'sort_order',
+            ])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges()
+            ->setDescriptionForEvent(fn (string $eventName): string => "page.{$eventName}");
     }
 }
