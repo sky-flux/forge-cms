@@ -137,9 +137,13 @@ test('records activity when a User is created / updated and never leaks the pass
         expect($attributes)->not->toHaveKey('password');
         expect($attributes)->not->toHaveKey('remember_token');
         expect($attributes)->not->toHaveKey('two_factor_secret');
+        expect($attributes)->not->toHaveKey('two_factor_recovery_codes');
+        expect($attributes)->not->toHaveKey('two_factor_confirmed_at');
         expect($old)->not->toHaveKey('password');
         expect($old)->not->toHaveKey('remember_token');
         expect($old)->not->toHaveKey('two_factor_secret');
+        expect($old)->not->toHaveKey('two_factor_recovery_codes');
+        expect($old)->not->toHaveKey('two_factor_confirmed_at');
     }
 });
 
